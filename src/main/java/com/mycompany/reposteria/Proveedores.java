@@ -25,6 +25,7 @@ public class Proveedores extends javax.swing.JFrame {
      */
     public Proveedores() {
         initComponents();
+        mostrarTableProveedores();
     }
     
      Conexion conexionObjeto = new Conexion();
@@ -33,37 +34,65 @@ public class Proveedores extends javax.swing.JFrame {
 public void searchDates() throws SQLException{
     String identidad = txtIdentidad.getText();
     
-    try{
-        String consultaSelect = "SELECT * FROM proveedores WHERE idProveedor = ?";
-        PreparedStatement statement = conexion.prepareStatement(consultaSelect);
-       
-        statement.setString(1, identidad  );
-        
-        ResultSet resultSet = statement.executeQuery();
-        
-        System.out.println(identidad);
-        System.out.println(resultSet);
+     try {  
+            String consultaSQL = "SELECT nombre, contacto, detalles " +
+                                 "FROM proveedores WHERE idproveedor = ? ";
+            
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
-        
-        DefaultTableModel modeloTabla = new DefaultTableModel();
-            modeloTabla.addColumn("Identidad");
+            statement.setString(1, identidad  );
+            
+            ResultSet resultSet = statement.executeQuery();
+            
+            if (resultSet.next()) {              
+                txtNombre.setText(resultSet.getString("nombre"));
+                txtContacto.setText(resultSet.getString("contacto"));
+                txtDetalles.setText(resultSet.getString("detalles"));
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontraron resultados para el ID proporcionado.");
+            }
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+        }
+}
+            
+
+ public void mostrarTableProveedores(){
+      try {        
+            String consultaSQL = "SELECT * " +
+                                 "FROM proveedores " ;
+
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            DefaultTableModel modeloTabla = new DefaultTableModel();
+            modeloTabla.addColumn("ID");
             modeloTabla.addColumn("Nombre");
             modeloTabla.addColumn("Contacto");
             modeloTabla.addColumn("Detalles");
 
-        
-          while (resultSet.next()) {
-                Object[] fila = {resultSet.getString("idproveedor"), resultSet.getString("nombre"), resultSet.getString("contacto"),resultSet.getString("detalles")};
+            while (resultSet.next()) {
+                Object[] fila = {
+                        resultSet.getString("idproveedor"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("contacto"),
+                        resultSet.getString("detalles"),
+                };
                 modeloTabla.addRow(fila);
             }
-          
-          tablaProveedores.setModel(modeloTabla);
-          statement.close();
-    }catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al buscar datos: " + ex.getMessage());
+
+            tablaProveedores.setModel(modeloTabla);
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
         }
-}
-            
+    }  
+
 
     public void insertDates(){
         String identidad = txtIdentidad.getText();
@@ -89,6 +118,7 @@ public void searchDates() throws SQLException{
                 txtNombre.setText("");
                 txtContacto.setText("");
                 txtDetalles.setText("");
+                mostrarTableProveedores();
             } else {
                 JOptionPane.showMessageDialog(this, "Error al insertar datos");
             }
