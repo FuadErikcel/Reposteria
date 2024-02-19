@@ -196,8 +196,8 @@ public void mostrarTablePastelesPersonalizados(){
 public void buscarTable(){
     try {
         String identidad = txtId.getText();
-            String consultaSQL = "SELECT idtorta, cantidad, relleno, sabor " +
-                                 "FROM tortapersonalizada WHERE tortapersonalizada.idppersonalizado =?";                             
+            String consultaSQL = "SELECT tortapersonalizada.idtorta, cantidad, relleno, sabor, precio " +
+                                 "FROM tortapersonalizada, torta WHERE tortapersonalizada.idppersonalizado =? AND torta.idtorta = tortapersonalizada.idtorta";                             
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setString(1, identidad  );
             
@@ -210,26 +210,11 @@ public void buscarTable(){
                     model.addColumn("Relleno");
                     model.addColumn("Sabor");  
                    
-//             String x = resultSet.getString("idtorta");
-//                    String y;
-//                    if(x=="TT0001"){
-//                        y="100";
-//                    }else if(x=="TT0002"){
-//                        y="200";
-//                    }else if(x=="TT0003"){
-//                        y="300";
-//                    }else if(x=="TT0004"){
-//                        y="450";
-//                    }else if(x=="TT0004"){
-//                        y="550";
-//                    }else if(x=="TT0004"){
-//                        y="600";
-//                    }       
                     
             while (resultSet.next()) {
                 Object[] fila = {
                         resultSet.getString("idtorta"),
-                        resultSet.getString("cantidad"),
+                        resultSet.getString("precio"),
                         resultSet.getString("cantidad"),
                         resultSet.getString("relleno"),
                         resultSet.getString("sabor")

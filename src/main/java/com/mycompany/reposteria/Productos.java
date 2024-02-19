@@ -77,14 +77,15 @@ public class Productos extends javax.swing.JFrame {
     public void insertDates1(){
         String identidad = txtIdentidad.getText();
         Double precio = Double.parseDouble(txtPrecio.getText());
-        String fechaElaboracion = txtFechaElaboracion.getText();
+        java.util.Date fecha = txtFechaSelect.getDate();
+        java.sql.Date fechaElaboracion = new java.sql.Date(fecha.getTime());
         
         try {
             String consultaInsert = "INSERT INTO producto(idproducto,precioproducto, fechaelaboracion) VALUES (?, ?, ?)";
             PreparedStatement statement = conexion.prepareStatement(consultaInsert);
             statement.setString(1, identidad);
             statement.setDouble(2, precio);
-            statement.setString(3, fechaElaboracion); 
+            statement.setDate(3, (fechaElaboracion)); 
             int filasInsertadas = statement.executeUpdate();
             statement.close();
         } catch (SQLException ex) {
@@ -95,14 +96,13 @@ public class Productos extends javax.swing.JFrame {
 
     public void insertDates(){
         String identidad = txtIdentidad.getText();
-        String precio = txtPrecio.getText();
-        String fechaElaboracion = txtFechaElaboracion.getText();
-        if(cbxProducto.getSelectedIndex()==0){
- 
+        if(cbxProducto.getSelectedIndex()==0){ 
             String tipo = cbxTipoGalleta.getSelectedItem().toString();
             String extra = txtExtra.getText();
-            String fechaVencimiento = txtFechaVencimiento.getText();
             int stock = Integer.parseInt(txtStock.getText());
+            java.util.Date fecha = txtVencimiento.getDate();
+            java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
+            
           
               try {
             String consultaInsert = "INSERT INTO galletas(idgalletas,tipo, extra, fechaVencimiento, stock) VALUES (?, ?, ?, ?,?)";
@@ -110,7 +110,7 @@ public class Productos extends javax.swing.JFrame {
             statement.setString(1, identidad);
             statement.setString(2, tipo);
             statement.setString(3, extra);
-            statement.setString(4, fechaVencimiento);
+            statement.setDate(4, fechaVencimiento);
             statement.setInt(5, stock);
             
             int filasInsertadas = statement.executeUpdate();
@@ -119,9 +119,9 @@ public class Productos extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
                 txtIdentidad.setText("");
                 txtExtra.setText("");
-                txtFechaVencimiento.setText("");
+                //txtFechaVencimiento.setText("");
                 txtStock.setText("");
-                txtFechaElaboracion.setText("");
+                //txtFechaElaboracion.setText("");
                 txtPrecio.setText("");
                 mostrarTableGalletas();
             } else {
@@ -135,15 +135,16 @@ public class Productos extends javax.swing.JFrame {
              
         }else if(cbxProducto.getSelectedIndex()==1){
             String tipo = cbxTipoPan.getSelectedItem().toString();
-            String fechaVencimiento = txtFechaVencimiento.getText();
             int stock = Integer.parseInt(txtStock.getText());
+            java.util.Date fecha = txtVencimiento.getDate();
+            java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
           
               try {
             String consultaInsert = "INSERT INTO pan(idpan,tipo, fechaVencimiento, stock) VALUES (?, ?, ?, ?)";
             PreparedStatement statement = conexion.prepareStatement(consultaInsert);
             statement.setString(1, identidad);
             statement.setString(2, tipo);
-            statement.setString(3, fechaVencimiento);
+            statement.setDate(3, fechaVencimiento);
             statement.setInt(4, stock);
             
             int filasInsertadas = statement.executeUpdate();
@@ -152,9 +153,9 @@ public class Productos extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
                 txtIdentidad.setText("");
                 txtExtra.setText("");
-                txtFechaVencimiento.setText("");
+                //txtFechaVencimiento.setText("");
                 txtStock.setText("");
-                txtFechaElaboracion.setText("");
+                
                 txtPrecio.setText("");
                 mostrarTablePan();
             } else {
@@ -168,11 +169,12 @@ public class Productos extends javax.swing.JFrame {
               
         }else if(cbxProducto.getSelectedIndex()==2){
                 String tipo = cbxPastelNormal.getSelectedItem().toString();
-                String fechaVencimiento = txtFechaVencimiento.getText();
                 int stock = Integer.parseInt(txtStock.getText());
                 String sabor = txtSabor.getText();
                 String relleno = txtRelleno.getText();
                 String betun = txtBetun.getText();
+                java.util.Date fecha = txtVencimiento.getDate();
+                java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
 
 
                   try {
@@ -184,7 +186,7 @@ public class Productos extends javax.swing.JFrame {
                 statement.setString(4, relleno);
                 statement.setString(5, betun);
                 statement.setInt(6, stock);
-                statement.setString(7, fechaVencimiento);
+                statement.setDate(7, fechaVencimiento);
 
 
                 int filasInsertadas = statement.executeUpdate();
@@ -193,9 +195,9 @@ public class Productos extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
                     txtIdentidad.setText("");
                     txtExtra.setText("");
-                    txtFechaVencimiento.setText("");
+                    //txtVencimiento.SET;
                     txtStock.setText("");
-                    txtFechaElaboracion.setText("");
+                    //txtFechaElaboracion.setText("");
                     txtPrecio.setText("");
                     txtSabor.setText("");
                     txtRelleno.setText("");
@@ -259,7 +261,8 @@ public class Productos extends javax.swing.JFrame {
           String identidad = txtIdentidad.getText();
             String consultaSQL = "SELECT idgalletas, fechaelaboracion, precioproducto,  fechavencimiento,  stock, extra " +
                                  "FROM galletas " +
-                                 "JOIN producto ON idgalletas = ? ";
+                                 "JOIN producto ON producto.idproducto = galletas.idgalletas " +
+                                  "AND galletas.idgalletas = ? ";
             
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
@@ -268,8 +271,8 @@ public class Productos extends javax.swing.JFrame {
             ResultSet resultSet = statement.executeQuery();
             
             if (resultSet.next()) {              
-                txtFechaElaboracion.setText(resultSet.getString("fechaelaboracion"));
-                txtFechaVencimiento.setText(resultSet.getString("fechavencimiento"));
+                //txtFechaElaboracion.setText(resultSet.getString("fechaelaboracion"));
+                //txtFechaVencimiento.setText(resultSet.getString("fechavencimiento"));
                 txtPrecio.setText(resultSet.getString("precioproducto"));
                 txtStock.setText(resultSet.getString("stock"));
                 txtExtra.setText(resultSet.getString("extra"));
@@ -387,11 +390,9 @@ public class Productos extends javax.swing.JFrame {
         txtExtra = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        txtFechaElaboracion = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtPrecio = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        txtFechaVencimiento = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaProductos = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
@@ -404,6 +405,9 @@ public class Productos extends javax.swing.JFrame {
         lbBetun = new javax.swing.JLabel();
         txtBetun = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
+        txtFechaSelect = new com.toedter.calendar.JDateChooser();
+        jButton1 = new javax.swing.JButton();
+        txtVencimiento = new com.toedter.calendar.JDateChooser();
 
         jLabel1.setText("jLabel1");
 
@@ -472,26 +476,12 @@ public class Productos extends javax.swing.JFrame {
         jLabel4.setText("Fecha de Elaboración:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 140, -1, -1));
 
-        txtFechaElaboracion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFechaElaboracionActionPerformed(evt);
-            }
-        });
-        jPanel1.add(txtFechaElaboracion, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 200, -1));
-
         jLabel5.setText("Precio:");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 170, -1, -1));
         jPanel1.add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 170, 200, -1));
 
         jLabel6.setText("Fecha de Vencimiento:");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 230, -1, -1));
-
-        txtFechaVencimiento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFechaVencimientoActionPerformed(evt);
-            }
-        });
-        jPanel1.add(txtFechaVencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 200, -1));
 
         tablaProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -552,6 +542,16 @@ public class Productos extends javax.swing.JFrame {
             }
         });
         jPanel1.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(499, 140, 90, -1));
+        jPanel1.add(txtFechaSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 200, -1));
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 260, -1, -1));
+        jPanel1.add(txtVencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 200, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 600));
 
@@ -573,14 +573,6 @@ public class Productos extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtExtraActionPerformed
 
-    private void txtFechaElaboracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaElaboracionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtFechaElaboracionActionPerformed
-
-    private void txtFechaVencimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaVencimientoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtFechaVencimientoActionPerformed
-
     private void txtStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStockActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtStockActionPerformed
@@ -601,6 +593,10 @@ public class Productos extends javax.swing.JFrame {
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
       BuscarGalletas();
     }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+ 
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -644,6 +640,7 @@ public class Productos extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbxProducto;
     private javax.swing.JComboBox<String> cbxTipoGalleta;
     private javax.swing.JComboBox<String> cbxTipoPan;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -662,12 +659,12 @@ public class Productos extends javax.swing.JFrame {
     private javax.swing.JTable tablaProductos;
     private javax.swing.JTextField txtBetun;
     private javax.swing.JTextField txtExtra;
-    private javax.swing.JTextField txtFechaElaboracion;
-    private javax.swing.JTextField txtFechaVencimiento;
+    private com.toedter.calendar.JDateChooser txtFechaSelect;
     private javax.swing.JTextField txtIdentidad;
     private javax.swing.JTextField txtPrecio;
     private javax.swing.JTextField txtRelleno;
     private javax.swing.JTextField txtSabor;
     private javax.swing.JTextField txtStock;
+    private com.toedter.calendar.JDateChooser txtVencimiento;
     // End of variables declaration//GEN-END:variables
 }
