@@ -195,9 +195,7 @@ public class Productos extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
                     txtIdentidad.setText("");
                     txtExtra.setText("");
-                    //txtVencimiento.SET;
                     txtStock.setText("");
-                    //txtFechaElaboracion.setText("");
                     txtPrecio.setText("");
                     txtSabor.setText("");
                     txtRelleno.setText("");
@@ -214,8 +212,218 @@ public class Productos extends javax.swing.JFrame {
                      }  
         }        
       
-}        
+}
     
+    public void updateData() {
+    String identidad = txtIdentidad.getText();
+
+    if (cbxProducto.getSelectedIndex() == 0) {
+        String tipo = cbxTipoGalleta.getSelectedItem().toString();
+        String extra = txtExtra.getText();
+        int stock = Integer.parseInt(txtStock.getText());
+        java.util.Date fecha = txtVencimiento.getDate();
+        java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
+
+        try {
+            String consultaUpdate = "UPDATE galletas SET tipo = ?, extra = ?, fechaVencimiento = ?, stock = ? WHERE idgalletas = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+            statement.setString(1, tipo);
+            statement.setString(2, extra);
+            statement.setDate(3, fechaVencimiento);
+            statement.setInt(4, stock);
+            statement.setString(5, identidad);
+
+            int filasActualizadas = statement.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Datos actualizados correctamente");
+                txtIdentidad.setText("");
+                txtExtra.setText("");
+                txtStock.setText("");
+                mostrarTableGalletas();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ninguna galleta con el ID especificado");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar datos: " + ex.getMessage());
+        }
+    } else if (cbxProducto.getSelectedIndex() == 1) {
+        String tipo = cbxTipoPan.getSelectedItem().toString();
+        int stock = Integer.parseInt(txtStock.getText());
+        java.util.Date fecha = txtVencimiento.getDate();
+        java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
+
+        try {
+            String consultaUpdate = "UPDATE pan SET tipo = ?, fechaVencimiento = ?, stock = ? WHERE idpan = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+            statement.setString(1, tipo);
+            statement.setDate(2, fechaVencimiento);
+            statement.setInt(3, stock);
+            statement.setString(4, identidad);
+
+            int filasActualizadas = statement.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Datos actualizados correctamente");
+                txtIdentidad.setText("");
+                txtStock.setText("");
+                mostrarTablePan();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún pan con el ID especificado");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar datos: " + ex.getMessage());
+        }
+    } else if (cbxProducto.getSelectedIndex() == 2) {
+        String tipo = cbxPastelNormal.getSelectedItem().toString();
+        int stock = Integer.parseInt(txtStock.getText());
+        String sabor = txtSabor.getText();
+        String relleno = txtRelleno.getText();
+        String betun = txtBetun.getText();
+        java.util.Date fecha = txtVencimiento.getDate();
+        java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
+
+        try {
+            String consultaUpdate = "UPDATE pnormal SET tipo = ?, sabor = ?, relleno = ?, betun = ?, stock = ?, fechaVencimiento = ? WHERE idpastelnormal = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+            statement.setString(1, tipo);
+            statement.setString(2, sabor);
+            statement.setString(3, relleno);
+            statement.setString(4, betun);
+            statement.setInt(5, stock);
+            statement.setDate(6, fechaVencimiento);
+            statement.setString(7, identidad);
+
+            int filasActualizadas = statement.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Datos actualizados correctamente");
+                txtIdentidad.setText("");
+                txtStock.setText("");
+                txtSabor.setText("");
+                txtRelleno.setText("");
+                txtBetun.setText("");
+                mostrarTablePastelesNormales();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún pastel normal con el ID especificado");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar datos: " + ex.getMessage());
+        }
+    }
+}
+
+    
+public void deleteProduct() {
+    String identidad = txtIdentidad.getText();
+    
+    try {
+        String consultaDelete = "DELETE FROM producto WHERE idproducto = ?";
+        PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+        statement.setString(1, identidad);
+        
+        int filasEliminadas = statement.executeUpdate();
+
+        if (filasEliminadas > 0) {
+            txtIdentidad.setText("");
+            txtPrecio.setText("");
+            txtFechaSelect.setDate(null);
+        }
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al eliminar producto: " + ex.getMessage());
+    }
+}
+    
+ public void deleteProduct1() {
+    String identidad = txtIdentidad.getText();
+    
+    if (cbxProducto.getSelectedIndex() == 0) {
+        try {
+            String consultaDelete = "DELETE FROM galletas WHERE idgalletas = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+            statement.setString(1, identidad);
+
+            int filasEliminadas = statement.executeUpdate();
+            
+            if (filasEliminadas > 0) {
+                deleteProduct();
+                JOptionPane.showMessageDialog(this, "Galleta eliminada correctamente");
+                txtIdentidad.setText("");
+                txtExtra.setText("");
+                txtStock.setText("");
+                mostrarTableGalletas();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ninguna galleta con el ID especificado");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar galleta: " + ex.getMessage());
+        }
+    } else if (cbxProducto.getSelectedIndex() == 1) {
+        try {
+            String consultaDelete = "DELETE FROM pan WHERE idpan = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+            statement.setString(1, identidad);
+            
+            int filasEliminadas = statement.executeUpdate();
+
+            if (filasEliminadas > 0) {
+                deleteProduct();
+                JOptionPane.showMessageDialog(this, "Pan eliminado correctamente");
+                txtIdentidad.setText("");
+                txtStock.setText("");
+                
+                mostrarTablePan();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún pan con el ID especificado");
+            }
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar pan: " + ex.getMessage());
+        }
+    } else if (cbxProducto.getSelectedIndex() == 2) {
+        try {
+            String consultaDelete = "DELETE FROM pnormal WHERE idpastelnormal = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+            statement.setString(1, identidad);
+            
+            int filasEliminadas = statement.executeUpdate();
+
+            if (filasEliminadas > 0) {
+                deleteProduct();
+                JOptionPane.showMessageDialog(this, "Pastel normal eliminado correctamente");
+                txtIdentidad.setText("");
+                txtStock.setText("");
+                txtSabor.setText("");
+                txtRelleno.setText("");
+                txtBetun.setText("");
+                
+                mostrarTablePastelesNormales();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún pastel normal con el ID especificado");
+            }
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar pastel normal: " + ex.getMessage());
+        }
+    }
+}
+ 
     public void mostrarTableGalletas(){
       try {        
             String consultaSQL = "SELECT idproducto, tipo, fechaelaboracion, fechavencimiento, precioproducto, stock " +
@@ -271,8 +479,8 @@ public class Productos extends javax.swing.JFrame {
             ResultSet resultSet = statement.executeQuery();
             
             if (resultSet.next()) {              
-                //txtFechaElaboracion.setText(resultSet.getString("fechaelaboracion"));
-                //txtFechaVencimiento.setText(resultSet.getString("fechavencimiento"));
+                txtFechaSelect.setDate(resultSet.getDate("fechaelaboracion"));
+                txtVencimiento.setDate(resultSet.getDate("fechaelaboracion"));
                 txtPrecio.setText(resultSet.getString("precioproducto"));
                 txtStock.setText(resultSet.getString("stock"));
                 txtExtra.setText(resultSet.getString("extra"));
@@ -408,6 +616,7 @@ public class Productos extends javax.swing.JFrame {
         txtFechaSelect = new com.toedter.calendar.JDateChooser();
         jButton1 = new javax.swing.JButton();
         txtVencimiento = new com.toedter.calendar.JDateChooser();
+        jButton2 = new javax.swing.JButton();
 
         jLabel1.setText("jLabel1");
 
@@ -544,14 +753,22 @@ public class Productos extends javax.swing.JFrame {
         jPanel1.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(499, 140, 90, -1));
         jPanel1.add(txtFechaSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 200, -1));
 
-        jButton1.setText("jButton1");
+        jButton1.setText("Eliminar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 260, -1, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 180, 90, -1));
         jPanel1.add(txtVencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 200, -1));
+
+        jButton2.setText("Modificar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 220, 90, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 600));
 
@@ -595,8 +812,12 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
- 
+        deleteProduct1();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        updateData();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -641,6 +862,7 @@ public class Productos extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbxTipoGalleta;
     private javax.swing.JComboBox<String> cbxTipoPan;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
