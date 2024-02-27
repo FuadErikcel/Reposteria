@@ -104,7 +104,18 @@ DefaultTableModel model;
             JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
          }
 }
- 
+ public void deleteProduct() {
+    String idProducto = txtId.getText();
+    try {
+        String consulta = "DELETE FROM producto WHERE idproducto = ?";
+        PreparedStatement statement = conexion.prepareStatement(consulta);
+        statement.setString(1, idProducto);
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al eliminar producto: " + ex.getMessage());
+    }
+}
  public void insertPPersonalizado(){
      String idPersonalizado = txtId.getText();
      String betun = txtBetun.getText();
@@ -124,6 +135,42 @@ DefaultTableModel model;
             JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
      }
  }
+ 
+ public void deletePersonalizado() {
+    String idPersonalizado = txtId.getText();
+
+    if (idPersonalizado.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del producto personalizado a eliminar");
+        return;
+    }
+
+    int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar este producto personalizado?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+    
+    if (confirmacion != JOptionPane.YES_OPTION) {
+        return; 
+    }
+
+    try {
+        String consulta = "DELETE FROM ppersonalizado WHERE idppersonalizado = ?";
+        PreparedStatement statement = conexion.prepareStatement(consulta);
+        statement.setString(1, idPersonalizado);
+        
+        int filasEliminadas = statement.executeUpdate();
+
+        if (filasEliminadas > 0) {
+            deleteProduct();
+            JOptionPane.showMessageDialog(this, "Producto personalizado eliminado correctamente");
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ningún producto personalizado con el ID especificado");
+        }
+
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al eliminar producto personalizado: " + ex.getMessage());
+    }
+}
+
  
 public void insertTortaPersonalizada() throws SQLException{
     String idTorta = txtTipoTorta.getText();
@@ -383,7 +430,12 @@ public void buscarText(){
         jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 100, -1, -1));
 
         jButton2.setText("Eliminar");
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 130, -1, -1));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 610, -1, -1));
 
         jLabel5.setText("Cantidad:");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 220, -1, -1));
@@ -545,6 +597,10 @@ public void buscarText(){
        buscarTable();
        buscarText();
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       deletePersonalizado();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
