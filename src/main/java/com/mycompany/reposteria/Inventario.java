@@ -46,7 +46,7 @@ public class Inventario extends javax.swing.JFrame {
             if (resultSet.next()) {              
                 PrecioIngredienteText.setText(resultSet.getString("precioingrediente"));
                 CantDisponibleText.setText(resultSet.getString("cantdisponible"));
-                FechaVencimientoText.setText(resultSet.getString("fechavencimiento"));
+                FechaVencimientoText.setDate(resultSet.getDate("fechavencimiento"));
                 NombreIngredienteText.setText(resultSet.getString("nombreingrediente"));
             } else {
                 JOptionPane.showMessageDialog(this, "No se encontraron resultados para el ID proporcionado.");
@@ -99,7 +99,8 @@ public class Inventario extends javax.swing.JFrame {
         int precio = Integer.parseInt(PrecioIngredienteText.getText());
         String nombreIngrediente = NombreIngredienteText.getText();
         int cantidad = Integer.parseInt(CantDisponibleText.getText());
-        String fecha = FechaVencimientoText.getText();
+        java.util.Date fecha = FechaVencimientoText.getDate();
+        java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
         
         //Connection conexion = conexionObjeto.getConexion();
         
@@ -110,7 +111,7 @@ public class Inventario extends javax.swing.JFrame {
             statement.setInt(2, precio);
             statement.setInt(3, cantidad);
             statement.setString(5, nombreIngrediente);
-            statement.setString(4, fecha);
+            statement.setDate(4, (fechaVencimiento));
 
             
             int filasInsertadas = statement.executeUpdate();
@@ -121,7 +122,7 @@ public class Inventario extends javax.swing.JFrame {
                 PrecioIngredienteText.setText("");
                 NombreIngredienteText.setText("");
                 CantDisponibleText.setText("");
-                FechaVencimientoText.setText("");
+                //FechaVencimientoText.setText("");
                 mostrarTableInventario();
             } else {
                 JOptionPane.showMessageDialog(this, "Error al insertar datos");
@@ -135,7 +136,88 @@ public class Inventario extends javax.swing.JFrame {
         
     }
     
+    public void Delete(){
+        String identidad = IdIngredienteText.getText();
+        
+        if(identidad.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor ingrese el ID del ingrediente a eliminar");
+        return;
+        }
 
+        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar este ingrediente?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+        
+        if(confirmacion != JOptionPane.YES_OPTION) {
+        return; 
+        }
+        
+        try {
+        String consultaDelete = "DELETE FROM inventario WHERE idingrediente = ?";
+        PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+        statement.setString(1, identidad);
+        
+        int filasEliminadas = statement.executeUpdate();
+
+        if (filasEliminadas > 0) {
+            JOptionPane.showMessageDialog(this, "Ingrediente eliminado correctamente");
+            IdIngredienteText.setText("");
+            PrecioIngredienteText.setText("");
+            NombreIngredienteText.setText("");
+            CantDisponibleText.setText("");
+            //FechaVencimientoText.setText("");
+            mostrarTableInventario();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ningún ingrediente con el ID especificado");
+        }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar ingrediente: " + ex.getMessage());
+        }
+    }
+    
+    public void Modificar(){
+        String identidad = IdIngredienteText.getText();
+        int precio = Integer.parseInt(PrecioIngredienteText.getText());
+        String nombre = NombreIngredienteText.getText();
+        int cantidad = Integer.parseInt(CantDisponibleText.getText());
+        java.util.Date fecha = FechaVencimientoText.getDate();
+        java.sql.Date fechaVencimiento = new java.sql.Date(fecha.getTime());
+        
+        if(identidad.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor ingrese el ID del inventaio a actualizar");
+            return;
+        }
+        
+        try {
+            String consultaUpdate = "UPDATE inventario SET precioingrediente = ?, nombreingrediente = ?, cantdisponible = ?, fechavencimiento = ? WHERE idingrediente = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+            statement.setInt(1, precio);
+            statement.setString(2, nombre);
+            statement.setInt(3, cantidad);
+            statement.setDate(4, fechaVencimiento);
+            statement.setString(5, identidad);
+
+            int filasActualizadas = statement.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Inventario actualizado correctamente");
+                IdIngredienteText.setText("");
+                PrecioIngredienteText.setText("");
+                NombreIngredienteText.setText("");
+                CantDisponibleText.setText("");
+                //FechaVencimientoText.setText("");
+                mostrarTableInventario();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún ingrediente con el ID especificado");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar inventario: " + ex.getMessage());
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -156,13 +238,13 @@ public class Inventario extends javax.swing.JFrame {
         CantDisponibleLabel = new javax.swing.JLabel();
         CantDisponibleText = new javax.swing.JTextField();
         FechaVencimientoLabel = new javax.swing.JLabel();
-        FechaVencimientoText = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaInventario = new javax.swing.JTable();
+        FechaVencimientoText = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -176,33 +258,32 @@ public class Inventario extends javax.swing.JFrame {
         IdIngredienteLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         IdIngredienteLabel.setText("Identidad");
         jPanel1.add(IdIngredienteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(43, 91, 103, -1));
-        jPanel1.add(IdIngredienteText, new org.netbeans.lib.awtextra.AbsoluteConstraints(181, 91, 110, -1));
+
+        IdIngredienteText.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                IdIngredienteTextFocusLost(evt);
+            }
+        });
+        jPanel1.add(IdIngredienteText, new org.netbeans.lib.awtextra.AbsoluteConstraints(181, 91, 120, -1));
 
         PrecioIngredienteLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         PrecioIngredienteLabel.setText("Precio :");
         jPanel1.add(PrecioIngredienteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(43, 132, -1, -1));
-        jPanel1.add(PrecioIngredienteText, new org.netbeans.lib.awtextra.AbsoluteConstraints(181, 132, 110, -1));
+        jPanel1.add(PrecioIngredienteText, new org.netbeans.lib.awtextra.AbsoluteConstraints(181, 132, 120, -1));
 
         NombreIngredienteLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         NombreIngredienteLabel.setText("Nombre: ");
         jPanel1.add(NombreIngredienteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(43, 173, -1, -1));
-        jPanel1.add(NombreIngredienteText, new org.netbeans.lib.awtextra.AbsoluteConstraints(181, 173, 110, -1));
+        jPanel1.add(NombreIngredienteText, new org.netbeans.lib.awtextra.AbsoluteConstraints(181, 173, 120, -1));
 
         CantDisponibleLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         CantDisponibleLabel.setText("Cantidad:");
         jPanel1.add(CantDisponibleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(43, 214, 118, -1));
-        jPanel1.add(CantDisponibleText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 214, 110, -1));
+        jPanel1.add(CantDisponibleText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 214, 120, -1));
 
         FechaVencimientoLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         FechaVencimientoLabel.setText("Fecha Vencimiento:");
         jPanel1.add(FechaVencimientoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(43, 255, -1, -1));
-
-        FechaVencimientoText.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                FechaVencimientoTextActionPerformed(evt);
-            }
-        });
-        jPanel1.add(FechaVencimientoText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 255, 110, -1));
 
         jButton1.setText("Guardar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -229,6 +310,11 @@ public class Inventario extends javax.swing.JFrame {
         jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 173, -1, -1));
 
         jButton4.setText("Eliminar");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 214, -1, -1));
 
         tablaInventario.setModel(new javax.swing.table.DefaultTableModel(
@@ -245,6 +331,7 @@ public class Inventario extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tablaInventario);
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 320, 610, 310));
+        jPanel1.add(FechaVencimientoText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 250, 130, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -265,7 +352,7 @@ public class Inventario extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        Modificar();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -276,9 +363,17 @@ public class Inventario extends javax.swing.JFrame {
         }   
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void FechaVencimientoTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FechaVencimientoTextActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_FechaVencimientoTextActionPerformed
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        Delete();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void IdIngredienteTextFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_IdIngredienteTextFocusLost
+        try {
+            searchDates();
+        } catch (SQLException ex) {
+            Logger.getLogger(Inventario.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+    }//GEN-LAST:event_IdIngredienteTextFocusLost
 
     /**
      * @param args the command line arguments
@@ -320,7 +415,7 @@ public class Inventario extends javax.swing.JFrame {
     private javax.swing.JLabel CantDisponibleLabel;
     private javax.swing.JTextField CantDisponibleText;
     private javax.swing.JLabel FechaVencimientoLabel;
-    private javax.swing.JTextField FechaVencimientoText;
+    private com.toedter.calendar.JDateChooser FechaVencimientoText;
     private javax.swing.JLabel IdIngredienteLabel;
     private javax.swing.JTextField IdIngredienteText;
     private javax.swing.JLabel NombreIngredienteLabel;

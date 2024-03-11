@@ -78,19 +78,14 @@ public void visible() {
         String nombre = txtnombre1.getText();
         String correo = txtcorreo1.getText();
         String contacto = txtcontacto1.getText();
-        String direccion = txtdireccion1.getText();
-        String salarios = txtsalarios1.getText();
-        String puesto = txtpuesto1.getText();
+        
         try{
-            String consultaInsert = "INSERT INTO persona(idPersona, nombre, correo, contacto, direccion, salario, puesto)VALUES (?,?,?,?,?,?,?)";
+            String consultaInsert = "INSERT INTO persona(idPersona, nombre, correo, contacto)VALUES (?,?,?,?)";
             PreparedStatement statemenr = conexion.prepareStatement(consultaInsert);
             statemenr.setString(1, identidad);
             statemenr.setString(2, nombre);
             statemenr.setString(3, correo);
             statemenr.setString(4, contacto);
-            statemenr.setString(5, direccion);
-            statemenr.setString(6, salarios);
-            statemenr.setString(7, puesto);
             int filasInsertadas = statemenr.executeUpdate();
             statemenr.close();
         }catch(SQLException ex){
@@ -103,23 +98,15 @@ public void visible() {
     
     public void insertDates() {
     String identidad = txtID1.getText();
-    String nombre = txtnombre1.getText();
-    String correo = txtcorreo1.getText();
-    String contacto = txtcontacto1.getText();
-    String direccion = txtdireccion1.getText();
     String salarios = txtsalarios1.getText();
     String puesto = txtpuesto1.getText();
 
     try {
         double salario = Double.parseDouble(salarios); // Parseamos el salario a double
 
-        String consultaInsert = "INSERT INTO persona (id_persona, nombre, correo, contacto, direccion, salario, puesto) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String consultaInsert = "INSERT INTO personal (personal.idpersona, salario, puesto) VALUES (?, ?, ?)";
         PreparedStatement statemenr = conexion.prepareStatement(consultaInsert);
         statemenr.setString(1, identidad);
-        statemenr.setString(2, nombre);
-        statemenr.setString(3, correo);
-        statemenr.setString(4, contacto);
-        statemenr.setString(5, direccion);
         statemenr.setDouble(6, salario);
         statemenr.setString(7, puesto);
 
@@ -557,7 +544,7 @@ public void visible() {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
-          insertarDatos1();
+          //insertarDatos1();
           insertDates();
 
     }//GEN-LAST:event_btnGuardarActionPerformed

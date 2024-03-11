@@ -146,21 +146,50 @@ DefaultTableModel model;
         
     }
     
+    public void DeleteCarrito() {
+        // Obtener la fila seleccionada
+        int filaSeleccionada = tableFac.getSelectedRow();
+
+        if (filaSeleccionada != -1) { // Verificar si hay una fila seleccionada
+            // Eliminar la fila del modelo de la tabla
+            DefaultTableModel model = (DefaultTableModel) tableFac.getModel();
+            model.removeRow(filaSeleccionada);
+
+            // Recalcular el total y subtotal después de la eliminación
+            double total = 0;
+            double precio1, cantidad1, subTotal;
+
+            for (int i = 0; i < tableFac.getRowCount(); i++) {
+                precio1 = Double.parseDouble(tableFac.getValueAt(i, 2).toString());
+                cantidad1 = Double.parseDouble(tableFac.getValueAt(i, 3).toString());
+                subTotal = precio1 * cantidad1;
+                total += subTotal;
+            }
+
+            // Actualizar los campos de total y subtotal
+            SubTotalText.setText(String.valueOf(total));
+            TotalText.setText(String.valueOf(total));
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecciona una fila para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    
     public void insertFactura(){
         String identidadFactura = IdFacturaText.getText();
-        String fecha = FechaVentaText.getText();
+        java.util.Date fecha = FechaVentaText.getDate();
+        java.sql.Date fechav = new java.sql.Date(fecha.getTime());
         
         try {
             String consultaInsert = "INSERT INTO factura(idfactura, fechaventa) VALUES (?, ?);";
             PreparedStatement statement = conexion.prepareStatement(consultaInsert);
             statement.setString(1, identidadFactura);
-            statement.setString(2, fecha);
+            statement.setDate(2, fechav);
             
             int filasInsertadas = statement.executeUpdate();
             
             if (filasInsertadas > 0) {
                 JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
-                //mostrarTableInventario();
                 
             } else {
                 JOptionPane.showMessageDialog(this, "Error al insertar datos");
@@ -186,7 +215,6 @@ DefaultTableModel model;
             
             if (filasInsertadas > 0) {
                 JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
-                //mostrarTableInventario();
                 
             } else {
                 JOptionPane.showMessageDialog(this, "Error al insertar datos");
@@ -207,16 +235,18 @@ DefaultTableModel model;
             PreparedStatement statement = conexion.prepareStatement(consultaInsert);
             
             for(int i=0; i<tableFac.getRowCount(); i++){
-            String cantidad = tableFac.getValueAt(i, 3).toString();
-            String idproducto = tableFac.getValueAt(i, 0).toString();
+                String cantidad = tableFac.getValueAt(i, 3).toString();
+                String idproducto = tableFac.getValueAt(i, 0).toString();
 
-            int cantidad1 = Integer.parseInt(cantidad);
-            
-            statement.setString(1, identidadFactura);
-            statement.setString(2, idproducto);
-            statement.setInt(3, cantidad1);
-            statement.executeUpdate();
+                int cantidad1 = Integer.parseInt(cantidad);
+
+                statement.setString(1, identidadFactura);
+                statement.setString(2, idproducto);
+                statement.setInt(3, cantidad1);
+                statement.executeUpdate();
             }
+            cargarTablaFacturaComponents(identidadFactura);
+            statement.close();
             
         }catch (SQLException ex) {
             ex.printStackTrace();
@@ -226,7 +256,7 @@ DefaultTableModel model;
         
     public void limpiar(){
         IdFacturaText.setText("");
-        FechaVentaText.setText("");
+        //FechaVentaText.setText("");
         IdPersonaText.setText("");
         NombreText.setText("");
         ContactoText.setText("");
@@ -241,7 +271,167 @@ DefaultTableModel model;
        }
      }
 
+    public void searchFactura() {
+        try {
+            String identidad = IdFacturaText.getText();
+            String consultaSQL = "SELECT factura.idfactura, factura.fechaventa, facturacliente.idclientef, " +
+                                 "facturaproducto.idproductof, facturaproducto.cantidad, producto.precioproducto " +
+                                 "FROM factura " +
+                                 "LEFT JOIN facturacliente ON factura.idfactura = facturacliente.idfacturac " +
+                                 "JOIN facturaproducto ON factura.idfactura = facturaproducto.idfacturap " +
+                                 "JOIN producto ON facturaproducto.idproductof = producto.idproducto " +
+                                 "WHERE factura.idfactura = ?";
+
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+            statement.setString(1, identidad);
+
+            ResultSet resultSet = statement.executeQuery();
+            
+            DefaultTableModel model = (DefaultTableModel) tableFac.getModel();
+            model.setRowCount(0);
+            
+            if (resultSet.next()) {
+                FechaVentaText.setDate(resultSet.getDate("fechaventa"));
+
+                // Verificar si hay datos de cliente
+                if (resultSet.getString("idclientef") != null) {
+                    IdPersonaText.setText(resultSet.getString("idclientef"));
+                    CbxFactura.setSelectedIndex(0);
+                    if(CbxFactura.getSelectedIndex()== 1){
+                        IdPersonaText.setEnabled(true);
+                        NombreText.setEnabled(true);
+                        ContactoText.setEnabled(true);
+                    }
+                    try {        
+                        searchClientes();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Factura.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    IdPersonaText.setText("");
+                    NombreText.setText("");
+                    ContactoText.setText("");
+                    CbxFactura.setSelectedIndex(0);
+                    if(CbxFactura.getSelectedIndex()== 0){
+                        IdPersonaText.setEnabled(false);
+                        NombreText.setEnabled(false);
+                        ContactoText.setEnabled(false);
+                    }
+                }
+                
+                double total = 0;
+                
+                do {
+                    String idProducto = resultSet.getString("idproductof");
+                    String nombre = obtenerNombreProducto(idProducto);
+                    String cantidad = resultSet.getString("cantidad");
+                    String precioUnitario = resultSet.getString("precioproducto");
+
+                    // Calcular el precio total
+                    double precio = Double.parseDouble(precioUnitario);
+                    double cantidadProducto = Double.parseDouble(cantidad);
+                    double subTotal = precio * cantidadProducto;
+
+                    // Agregar fila a la tabla
+                    model.addRow(new Object[]{idProducto, nombre, precioUnitario, cantidad});
+                    total += subTotal;
+                } while (resultSet.next());
+                String totalStr = Double.toString(total);
+                TotalText.setText(totalStr);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontraron resultados para el ID proporcionado.");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+        }
+    }
+
+    public void cargarTablaFacturaComponents(String idFactura) {
+        try {
+            String consultaSQL = "SELECT idproductof, cantidad FROM facturaproducto WHERE idfacturap = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+            statement.setString(1, idFactura);
+            ResultSet resultSet = statement.executeQuery();
+
+            // Limpiar la tabla antes de cargar nuevos datos
+            DefaultTableModel model = (DefaultTableModel) tableFac.getModel();
+            model.setRowCount(0);
+
+            // Llenar la tabla con los componentes de la factura
+            do {
+                if (resultSet.next()){
+                    String idProducto = resultSet.getString("idproductof");
+                    String nombre = obtenerNombreProducto(idProducto);
+                    String cantidad = resultSet.getString("cantidad");
+                    String precioUnitario = String.valueOf(obtenerPrecioProducto(idProducto));
+
+                    // Calcular el precio total
+                    double precioTotal = Double.parseDouble(precioUnitario) * Integer.parseInt(cantidad);
+
+                    // Agregar fila a la tabla
+                    model.addRow(new Object[]{idProducto, nombre, precioUnitario, cantidad, precioTotal});
+                }
+            } while (resultSet.next());
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al cargar la tabla de componentes de la factura: " + ex.getMessage());
+        }
+    }
+
+    // Agregar métodos para obtener el nombre y precio del producto
+    public String obtenerNombreProducto(String idProducto) {
+    String tipo = idProducto.substring(0, 2);
+    String nombre = null;
     
+        switch (tipo) {
+            case "GA":
+                nombre = "Galleta";
+                break;
+            case "PA":
+                nombre = "Pan";
+                break;
+            case "PN":
+                nombre = "Pastel Normal";
+                break;
+            case "PP":
+                nombre = "Pastel Personalizado";
+                break;
+        }
+
+        return nombre;
+    }
+
+    public double obtenerPrecioProducto(String idProducto) throws SQLException {
+        double precio = 0.0;
+
+        try {
+            String consultaSQL = "SELECT precioproducto FROM producto WHERE idproducto = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+            statement.setString(1, idProducto);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                precio = resultSet.getDouble("precioproducto");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new SQLException("Error al obtener el precio del producto: " + ex.getMessage());
+        }
+
+        return precio;
+    }
+
+
+
+        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -271,7 +461,6 @@ DefaultTableModel model;
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         FechaVentaLabel = new javax.swing.JLabel();
-        FechaVentaText = new javax.swing.JTextField();
         SubTotalLabel = new javax.swing.JLabel();
         SubTotalText = new javax.swing.JTextField();
         IdProductoLabel = new javax.swing.JLabel();
@@ -283,6 +472,7 @@ DefaultTableModel model;
         TotalLabel = new javax.swing.JLabel();
         TotalText = new javax.swing.JTextField();
         CbxFactura = new javax.swing.JComboBox<>();
+        FechaVentaText = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -345,15 +535,18 @@ DefaultTableModel model;
         });
         jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 190, -1, -1));
 
-        jButton2.setText("Eliminar Producto");
+        jButton2.setText("Eliminar del Carrito");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 230, 125, -1));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 230, 140, -1));
 
         IdPersonaText.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                IdPersonaTextFocusGained(evt);
+            }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 IdPersonaTextFocusLost(evt);
             }
@@ -371,6 +564,11 @@ DefaultTableModel model;
         jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 390, -1, -1));
 
         jButton4.setText("Buscar");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, -1, -1));
 
         jButton5.setText("Limpiar");
@@ -384,7 +582,6 @@ DefaultTableModel model;
         FechaVentaLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         FechaVentaLabel.setText(" Fecha:");
         jPanel1.add(FechaVentaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 100, 43, -1));
-        jPanel1.add(FechaVentaText, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 100, 100, -1));
 
         SubTotalLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         SubTotalLabel.setText("SubTotal:");
@@ -437,7 +634,7 @@ DefaultTableModel model;
         ));
         jScrollPane1.setViewportView(tableFac);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 440, 810, 360));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 440, 810, 360));
 
         TotalLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         TotalLabel.setText("Total:");
@@ -451,6 +648,7 @@ DefaultTableModel model;
             }
         });
         jPanel1.add(CbxFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 110, 30));
+        jPanel1.add(FechaVentaText, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 100, 140, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -475,7 +673,7 @@ DefaultTableModel model;
     }//GEN-LAST:event_IdFacturaTextActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        DeleteCarrito();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void SubTotalTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubTotalTextActionPerformed
@@ -535,6 +733,9 @@ DefaultTableModel model;
 
     private void CbxFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CbxFacturaActionPerformed
         if(CbxFactura.getSelectedIndex()==1){
+            IdPersonaText.setText("");
+            NombreText.setText("");
+            ContactoText.setText("");
             IdPersonaText.setEnabled(false);
             NombreText.setEnabled(false);
             ContactoText.setEnabled(false);
@@ -552,6 +753,14 @@ DefaultTableModel model;
     private void CantidadTextKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CantidadTextKeyTyped
         
     }//GEN-LAST:event_CantidadTextKeyTyped
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        searchFactura();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void IdPersonaTextFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_IdPersonaTextFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_IdPersonaTextFocusGained
 
     /**
      * @param args the command line arguments
@@ -595,7 +804,7 @@ DefaultTableModel model;
     private javax.swing.JLabel ContactoLabel;
     private javax.swing.JTextField ContactoText;
     private javax.swing.JLabel FechaVentaLabel;
-    private javax.swing.JTextField FechaVentaText;
+    private com.toedter.calendar.JDateChooser FechaVentaText;
     private javax.swing.JLabel IdClienteLabel;
     private javax.swing.JTextField IdFacturaText;
     private javax.swing.JTextField IdPersonaText;
