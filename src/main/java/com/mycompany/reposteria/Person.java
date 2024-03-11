@@ -2,10 +2,13 @@ package com.mycompany.reposteria;
 
 //import com.mycompany.reposteria.Conexion;
 //import com.mycompany.reposteriac.Conexion;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /*
@@ -18,20 +21,26 @@ import javax.swing.table.DefaultTableModel;
  * @author angem
  */
 public class Person extends javax.swing.JFrame {
-//    DefaultTableModel model = new DefaultTableModel();
+  DefaultTableModel model = new DefaultTableModel();
     /*
      * Creates new form Person
      */
     public Person() {
          initComponents();
+                 if(cbmPuesto.getSelectedIndex() == 0){
+                   mostrarTablaCliente(); 
+                 }else {
+                    mostrarTablaPersonal(); 
+                 }
+             
+             
+         
          visible();   
     }
     
     Conexion conexionObjeto = new Conexion();
     Connection conexion = conexionObjeto.getConexion();
-    
-// Declara un booleano para controlar si se han seleccionado opciones válidas
-private boolean opcionesSeleccionadas = false;
+    private boolean opcionesSeleccionadas = false;
 
 public void visible() {
     int index = cbmPersona.getSelectedIndex();
@@ -50,7 +59,7 @@ public void visible() {
         lbdireccion.setVisible(true);
         txtsalarios1.setVisible(false);
         lbsalario.setVisible(false);
-        txtpuesto1.setVisible(false);
+        cbmPuesto.setVisible(false);
         lbpuesto.setVisible(false);
     } else if (index == 1) { // Si se selecciona la segunda opción
         // Mostrar los componentes relevantes y ocultar los demás
@@ -66,203 +75,267 @@ public void visible() {
         lbdireccion.setVisible(false);
         txtsalarios1.setVisible(true);
         lbsalario.setVisible(true);
-        txtpuesto1.setVisible(true);
+        cbmPuesto.setVisible(true);
         lbpuesto.setVisible(true);
     }
 }
 
 
 
-    public void insertarDatos1(){
-        String identidad = txtID1.getText();
-        String nombre = txtnombre1.getText();
-        String correo = txtcorreo1.getText();
-        String contacto = txtcontacto1.getText();
-        
-        try{
-            String consultaInsert = "INSERT INTO persona(idPersona, nombre, correo, contacto)VALUES (?,?,?,?)";
-            PreparedStatement statemenr = conexion.prepareStatement(consultaInsert);
-            statemenr.setString(1, identidad);
-            statemenr.setString(2, nombre);
-            statemenr.setString(3, correo);
-            statemenr.setString(4, contacto);
-            int filasInsertadas = statemenr.executeUpdate();
-            statemenr.close();
-        }catch(SQLException ex){
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
-        }
-    }
-    
-    
-    
-    public void insertDates() {
+public void insertarDatos1() {
     String identidad = txtID1.getText();
-    String salarios = txtsalarios1.getText();
-    String puesto = txtpuesto1.getText();
-
+    String nombre = txtnombre1.getText();
+    String correo = txtcorreo1.getText();
+    String contacto = txtcontacto1.getText();
+    
     try {
-        double salario = Double.parseDouble(salarios); // Parseamos el salario a double
+        String consultaInsert = "INSERT INTO persona(idpersona, nombre, correo, contacto) VALUES (?, ?, ?, ?)";
+        PreparedStatement statement = conexion.prepareStatement(consultaInsert);
+        statement.setString(1, identidad);
+        statement.setString(2, nombre);
+        statement.setString(3, correo);
+        statement.setString(4, contacto);
+        
+        int filasInsertadas = statement.executeUpdate();
+        
+        if (filasInsertadas > 0) {
+            JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
+            // Mostrar los datos actualizados en la tabla de cliente
+            mostrarTablaCliente();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al insertar datos");
+        }
+        
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al insertar datos " + ex.getMessage());
+    }
+}
 
-        String consultaInsert = "INSERT INTO personal (personal.idpersona, salario, puesto) VALUES (?, ?, ?)";
-        PreparedStatement statemenr = conexion.prepareStatement(consultaInsert);
-        statemenr.setString(1, identidad);
-        statemenr.setDouble(6, salario);
-        statemenr.setString(7, puesto);
 
-        int filasInsertadas = statemenr.executeUpdate();
+    
+    
+    
+public void insertDates() {
+String identidad = txtID1.getText();
+    String nombre = txtnombre1.getText();
+    String correo = txtcorreo1.getText();
+    String contacto = txtcontacto1.getText();
+    String direccion = txtdireccion1.getText();
+    String salarios = txtsalarios1.getText();
+    String puesto = cbmPuesto.getSelectedItem().toString();
+ if(cbmPersona.getSelectedIndex()==0){
+    
+    try {
+        String consultaInsert = "INSERT INTO cliente(Idcliente, direccion)VALUES (?, ?)";
+        PreparedStatement statement = conexion.prepareStatement(consultaInsert);
+        statement.setString(1, identidad);
+        statement.setString(2, direccion);
+
+        int filasInsertadas = statement.executeUpdate();
 
         if (filasInsertadas > 0) {
             JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
             // Limpiar los campos después de la inserción exitosa
-            txtID1.setText("");
-            txtnombre1.setText("");
-            txtcorreo1.setText("");
-            txtcontacto1.setText("");
-            txtdireccion1.setText("");
-            txtsalarios1.setText("");
-            txtpuesto1.setText("");
-            // Aquí debes llamar al método para mostrar los datos en tu tabla
-            mostrarTablaCliente();
-            mostrarTablaPersonal();
-            // mostrarTablaPersonas();
+             limpiarCampos();
+            
+            // Mostrar los datos actualizados en la tabla de cliente
+                mostrarTablaCliente();
+            
         } else {
             JOptionPane.showMessageDialog(this, "Error al insertar datos");
         }
-        statemenr.close();
+        statement.close();
     } catch (NumberFormatException ex) {
         JOptionPane.showMessageDialog(this, "Error: El salario debe ser un valor numérico válido.");
     } catch (SQLException ex) {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
     }
+  }else if(cbmPersona.getSelectedIndex()==1){
+      try {
+        double salario = Double.parseDouble(salarios); // Parseamos el salario a double
+
+        String consultaInsert = "INSERT INTO personal(idpersonal, salario, puesto) VALUES (?,?,?)";
+        PreparedStatement statement = conexion.prepareStatement(consultaInsert);
+        statement.setString(1, identidad);
+        statement.setDouble(2, salario);
+        statement.setString(3, puesto);
+
+
+        int filasInsertadas = statement.executeUpdate();
+
+        if (filasInsertadas > 0) {
+            JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
+            
+                // Limpiar los campos después de la inserción exitosa
+                limpiarCampos();
+                // Mostrar los datos actualizados en la tabla de personal
+                mostrarTablaPersonal();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al insertar datos");
+        }
+        statement.close();
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Error: El salario debe ser un valor numérico válido.");
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
+    }
+  }
 }
-    public void mostrarTablaCliente(){
-        try{
-            String consultaSQL = "SELECT id_persona, nombre, correo, contacto, direccion "+
-                                 "FROM cliente"+
-                                 "JOIN persona ON persona.id_persona=cliente.idcliente";
-             
-            PreparedStatement statemenr = conexion.prepareStatement(consultaSQL);
-            ResultSet resultSet = statemenr.executeQuery();
-            
-             DefaultTableModel modeloTabla = new DefaultTableModel();
-             modeloTabla.addColumn("Identidad");
-             modeloTabla.addColumn("Nombre");
-             modeloTabla.addColumn("Correo");
-             modeloTabla.addColumn("Contacto");
-             modeloTabla.addColumn("Direccion");
-             
-             while(resultSet.next()){
-                 Object[] fila= {
-                     resultSet.getString("id_personal"),
-                      resultSet.getString("nombre"),
-                       resultSet.getString("correo"),
-                        resultSet.getString("contacto"),
-                         resultSet.getString("direccion")
-                     
-                 };
-                 modeloTabla.addRow(fila);
-             }
-             
-            Tabla.setModel(modeloTabla);
-            statemenr.close();
-        } catch (SQLException ex){
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this,"Error al ejecutar consulta: " + ex.getMessage());
+
+public void limpiarCampos() {
+    txtID1.setText("");
+    txtnombre1.setText("");
+    txtcorreo1.setText("");
+    txtcontacto1.setText("");
+    txtdireccion1.setText("");
+    txtsalarios1.setText("");
+    cbmPuesto.setSelectedIndex(0);
+}
+
+
+
+    
+public void mostrarTablaCliente() {
+    try {
+        String consultaSQL = "SELECT idcliente, nombre, correo, contacto, direccion " +
+                             "FROM cliente " +
+                              "JOIN persona ON persona.idpersona = cliente.idcliente";
+
+        PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+        ResultSet resultSet = statement.executeQuery();
+
+        DefaultTableModel modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("Identidad");
+        modeloTabla.addColumn("Nombre");
+        modeloTabla.addColumn("Correo");
+        modeloTabla.addColumn("Contacto");
+        modeloTabla.addColumn("Direccion");
+
+        while (resultSet.next()) {
+            Object[] fila = {
+                resultSet.getString("idcliente"),
+                resultSet.getString("nombre"),
+                resultSet.getString("correo"),
+                resultSet.getString("contacto"),
+                resultSet.getString("direccion")
+            };
+            modeloTabla.addRow(fila);
         }
+
+        Tabla.setModel(modeloTabla);
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
     }
+}
+
+
+
+
  
-    public void BuscarCliente(){
-         try{
-             String identidad = txtID1.getText();
-             String consultaSQL = "SELECT id_persona, nombre, correo, contacto, direccion,"+
-                     "FROM cliente"+
-                     "JOIN persona ON id_persona = ?";
-            PreparedStatement statemenr = conexion.prepareStatement(consultaSQL);
-            statemenr.setString(1, identidad);
-            ResultSet resultSet = statemenr.executeQuery();
-            if ( resultSet.next()){
-                txtID1.setText(resultSet.getString("identidad"));
-                txtnombre1.setText(resultSet.getString("nombre"));
-                txtcorreo1.setText(resultSet.getString("correo"));
-                txtcontacto1.setText(resultSet.getString("contacto"));
-                txtdireccion1.setText(resultSet.getString("direccion"));
-                
-            } else{
-                JOptionPane.showMessageDialog(this, "No se encontraron resultados para la identidad proporcionado.");
-            }
-            statemenr.close();
-         }catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
-    }
- }
-  
-         public void mostrarTablaPersonal(){
-         try{
-             String consultaSQL = "SELECT id_persona, nombre, correo, contacto, salario, puesto"+
-                                  "FROM personal"+
-                                  "JOIN persona ON  persona id_persona = persona.idpersona";
-             PreparedStatement  statemenr = conexion.prepareStatement(consultaSQL);
-             
-             ResultSet resultSet = statemenr.executeQuery();
-             
-              DefaultTableModel modeloTabla = new  DefaultTableModel();
-              modeloTabla.addColumn("Identidad");
-              modeloTabla.addColumn("Nombre");
-              modeloTabla.addColumn("Correo");
-              modeloTabla.addColumn("Contacto");
-              modeloTabla.addColumn("Salario");
-              modeloTabla.addColumn("Puesto");
-              
-              while (resultSet.next()){
-                  Object[] fila = {
-                      resultSet.getString("id_persona"),
-                      resultSet.getString("nombre"),
-                      resultSet.getString("correo"),
-                      resultSet.getString("contacto"),
-                      resultSet.getString("salario"),
-                      resultSet.getString("puesto")
-                  };
-                  
-                  modeloTabla.addRow(fila);
-              }
-            Tabla.setModel(modeloTabla);
-            statemenr.close();  
+ public void BuscarCliente() {
+    try {
+        String identidad = txtID1.getText();
+        String consultaSQL = "SELECT idcliente, nombre, correo, contacto, direccion " +
+                             "FROM cliente " +
+                             "JOIN persona ON cliente.idcliente = persona.idpersona " +
+                             "WHERE  cliente.idcliente = ?";
+        PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+        statement.setString(1, identidad);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            txtID1.setText(resultSet.getString("idcliente"));
+            txtnombre1.setText(resultSet.getString("nombre"));
+            txtcorreo1.setText(resultSet.getString("correo"));
+            txtcontacto1.setText(resultSet.getString("contacto"));
+            txtdireccion1.setText(resultSet.getString("direccion"));
             
-         }catch(SQLException ex) {
-             ex.printStackTrace();
-              JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron resultados para la identidad proporcionada.");
         }
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
     }
-         
-        public void BuscarPersonal(){
-            try{
-                String identidad = txtID1.getText();
-            String consultaSQL = "SELECT id_persona, nombre, correo, contacto, direccion,"+
-                     "FROM personal"+
-                     "JOIN persona ON id_persona = ?";
-            PreparedStatement statemenr = conexion.prepareStatement(consultaSQL);
-            statemenr.setString(1, identidad);
-            ResultSet resultSet = statemenr.executeQuery();
-            if ( resultSet.next()){
-                txtID1.setText(resultSet.getString("identidad"));
-                txtnombre1.setText(resultSet.getString("nombre"));
-                txtcorreo1.setText(resultSet.getString("correo"));
-                txtcontacto1.setText(resultSet.getString("contacto"));
-                txtsalarios1.setText(resultSet.getString("salario"));
-                txtpuesto1.setText(resultSet.getString("puesto"));
-                
-            } else{
-                JOptionPane.showMessageDialog(this, "No se encontraron resultados para la identidad proporcionado.");
-            }
-            statemenr.close();
-         }catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+}
+ 
+ public void BuscarPersonal(){
+     try{
+         String identidad = txtID1.getText();
+         String consultaSQL ="SELECT idpersonal, nombre, correo, contacto, salario, puesto " +
+                             "FROM personal " +
+                             "JOIN persona ON personal.idpersonal = persona.idpersona " +
+                             "WHERE personal.idpersonal = ?"; 
+
+          PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+        statement.setString(1, identidad);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            txtID1.setText(resultSet.getString("idpersonal"));
+            txtnombre1.setText(resultSet.getString("nombre"));
+            txtcorreo1.setText(resultSet.getString("correo"));
+            txtcontacto1.setText(resultSet.getString("contacto"));
+            txtsalarios1.setText(resultSet.getString("salario"));
+            cbmPuesto.setSelectedItem(resultSet.getString("puesto"));
+
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron resultados para la identidad proporcionada.");
         }
-      }
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+    }
+}
+
+  
+public void mostrarTablaPersonal() {
+    try {
+        String consultaSQL = "SELECT idpersona, nombre, correo, contacto, salario, puesto " +
+                             "FROM personal " +
+                             "JOIN persona ON personal.idpersonal = persona.idpersona"; // Cambiado id_persona a idpersona
+        PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+        ResultSet resultSet = statement.executeQuery();
+
+        DefaultTableModel modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("Identidad");
+        modeloTabla.addColumn("Nombre");
+        modeloTabla.addColumn("Correo");
+        modeloTabla.addColumn("Contacto");
+        modeloTabla.addColumn("Salario");
+        modeloTabla.addColumn("Puesto");
+
+        while (resultSet.next()) {
+            Object[] fila = {
+                resultSet.getString("idpersona"),
+                resultSet.getString("nombre"),
+                resultSet.getString("correo"),
+                resultSet.getString("contacto"),
+                resultSet.getString("salario"),
+                resultSet.getString("puesto")
+            };
+            modeloTabla.addRow(fila);
+        }
+
+        Tabla.setModel(modeloTabla);
+        statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+    }
+}
+
+
+         
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -299,12 +372,14 @@ public void visible() {
         txtsalarios1 = new javax.swing.JTextField();
         lbsalario = new javax.swing.JLabel();
         lbpuesto = new javax.swing.JLabel();
-        txtpuesto1 = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         Tabla = new javax.swing.JTable();
         cbmPersona = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
+        cbmPuesto = new javax.swing.JComboBox<>();
+        btnBuscar = new javax.swing.JButton();
+        JBmodificar = new javax.swing.JButton();
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 51, 51));
@@ -428,6 +503,22 @@ public void visible() {
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("Persona");
 
+        cbmPuesto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Barista", "Camarero/a", "Cajero/a", "Cocinero/a", "Auxiliar de limpieza", "Gerente de Cafetería", "Repostero/a", "Barista especializado/a", "Encargado/a de compras", "Encargado/a de marketing", "Encargado/a de recursos humanos", "Encargado/a de eventos", "Barista supervisor/a", "Recepcionista" }));
+
+        btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
+
+        JBmodificar.setText("Modificar");
+        JBmodificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JBmodificarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -446,13 +537,17 @@ public void visible() {
                                         .addComponent(lbcorreo, javax.swing.GroupLayout.Alignment.LEADING)))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtcontacto1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(txtID1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtID1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGap(91, 91, 91)
-                                        .addComponent(btnGuardar))
-                                    .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(btnGuardar)
+                                            .addComponent(btnBuscar)
+                                            .addComponent(JBmodificar)))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -463,10 +558,10 @@ public void visible() {
                                     .addComponent(lbsalario))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtpuesto1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtsalarios1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtdireccion1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(cbmPersona, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(cbmPersona, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbmPuesto, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(81, 81, 81)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -487,11 +582,13 @@ public void visible() {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnBuscar))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(JBmodificar))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbcontacto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtcontacto1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -512,7 +609,7 @@ public void visible() {
                         .addGap(12, 12, 12)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtpuesto1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(cbmPuesto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -544,7 +641,7 @@ public void visible() {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
-          //insertarDatos1();
+          insertarDatos1();
           insertDates();
 
     }//GEN-LAST:event_btnGuardarActionPerformed
@@ -554,8 +651,13 @@ public void visible() {
     }//GEN-LAST:event_txtcontacto1ActionPerformed
 
     private void cbmPersonaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbmPersonaActionPerformed
-        // TODO add your handling code here:
-      visible();
+        
+      if(cbmPersona.getSelectedIndex() == 0){
+                   mostrarTablaCliente(); 
+                 }else {
+                    mostrarTablaPersonal(); 
+                 }
+        visible();
     }//GEN-LAST:event_cbmPersonaActionPerformed
 
     private void cbmPersonaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_cbmPersonaFocusLost
@@ -565,6 +667,52 @@ public void visible() {
     private void txtID1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtID1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtID1ActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        if(cbmPersona.getSelectedIndex() == 0){
+            BuscarCliente();
+        }else if (cbmPersona.getSelectedIndex() == 1){
+        BuscarPersonal();
+        }
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void JBmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JBmodificarActionPerformed
+    String identidad = txtID1.getText();
+    String nombre = txtnombre1.getText();
+    String correo = txtcorreo1.getText();
+    String contacto = txtcontacto1.getText();
+    String direccion = txtdireccion1.getText();
+//    String salarios = txtsalarios1.getText();
+//    String puesto = cbmPuesto.getSelectedItem().toString();
+
+    // Verificar si el campo de identidad está vacío
+    if(identidad.isEmpty()){
+        JOptionPane.showMessageDialog(this, "Por favor ingrese la identidad del cliente a actualizar");
+            return;
+    }
+    try{
+        String consultaUpdate = "UPDATE cliente SET nombre = ?, correo = ?, contacto = ?, direccion = ? WHERE idcliente = ?" ;
+        PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+         statement.setString(1, identidad);
+         statement.setString(2, nombre);
+         statement.setString(3, correo);
+         statement.setString(4, contacto);
+         statement.setString(5, direccion);
+         
+         int filasActualizadas = statement.executeUpdate();
+         if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Cliente actualizado correctamente");
+                limpiarCampos();
+                mostrarTablaCliente();
+        }else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún cliente con la identidad proporionada");
+            }
+          statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar cliente: " + ex.getMessage());
+        }
+    }//GEN-LAST:event_JBmodificarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -602,9 +750,12 @@ public void visible() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton JBmodificar;
     private javax.swing.JTable Tabla;
+    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JComboBox<String> cbmPersona;
+    private javax.swing.JComboBox<String> cbmPuesto;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -633,7 +784,6 @@ public void visible() {
     private javax.swing.JTextField txtnombre;
     private javax.swing.JTextField txtnombre1;
     private javax.swing.JTextField txtpuesto;
-    private javax.swing.JTextField txtpuesto1;
     private javax.swing.JTextField txtsalarios;
     private javax.swing.JTextField txtsalarios1;
     // End of variables declaration//GEN-END:variables
