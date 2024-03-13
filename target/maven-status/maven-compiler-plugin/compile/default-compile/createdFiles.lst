@@ -9,6 +9,7 @@ com\mycompany\reposteria\Person$6.class
 com\mycompany\reposteria\Factura$3.class
 com\mycompany\reposteria\Factura$11.class
 com\mycompany\reposteria\Productos$11.class
+com\mycompany\reposteria\Consultas$1.class
 com\mycompany\reposteria\Inventario$6.class
 com\mycompany\reposteria\PastelesPersonalizados$12.class
 com\mycompany\reposteria\Productos$8.class
@@ -17,6 +18,7 @@ com\mycompany\reposteria\Proveedores$7.class
 com\mycompany\reposteria\PastelesPersonalizados$8.class
 com\mycompany\reposteria\Proveedores$6.class
 com\mycompany\reposteria\Factura$12.class
+com\mycompany\reposteria\Consultas$4.class
 com\mycompany\reposteria\Factura$1.class
 com\mycompany\reposteria\Inventario$3.class
 com\mycompany\reposteria\Productos$12.class
@@ -40,6 +42,7 @@ com\mycompany\reposteria\Person$4.class
 com\mycompany\reposteria\Productos$10.class
 com\mycompany\reposteria\Factura$5.class
 com\mycompany\reposteria\PastelesPersonalizados.class
+com\mycompany\reposteria\Consultas$3.class
 com\mycompany\reposteria\Factura$13.class
 com\mycompany\reposteria\PastelesPersonalizados$5.class
 com\mycompany\reposteria\Proveedores$2.class
@@ -54,6 +57,7 @@ com\mycompany\reposteria\Productos$9.class
 com\mycompany\reposteria\Productos$2.class
 com\mycompany\reposteria\Person$3.class
 com\mycompany\reposteria\Factura$14.class
+com\mycompany\reposteria\Consultas$2.class
 com\mycompany\reposteria\Proveedores$4.class
 com\mycompany\reposteria\PastelesPersonalizados$3.class
 com\mycompany\reposteria\Factura$6.class
@@ -65,4 +69,5 @@ com\mycompany\reposteria\PastelesPersonalizados$6.class
 com\mycompany\reposteria\Reposteria.class
 com\mycompany\reposteria\Inventario$2.class
 com\mycompany\reposteria\Inventario$5.class
+com\mycompany\reposteria\Consultas.class
 com\mycompany\reposteria\PastelesPersonalizados$9.class
