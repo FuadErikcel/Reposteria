@@ -16,12 +16,12 @@ import javax.swing.JOptionPane;
  *
  * @author Bryan Aguiluz
  */
-public class Consultas extends javax.swing.JFrame {
+public class ConsultasFactura extends javax.swing.JFrame {
 
     /**
      * Creates new form Consultas
      */
-    public Consultas() {
+    public ConsultasFactura() {
         initComponents();
         tabla(1, (String) CbxFiltroOrden.getSelectedItem(), obtenerLimiteSeleccionado());
     }
@@ -217,7 +217,7 @@ public class Consultas extends javax.swing.JFrame {
         try {
         FiltroDias();
         } catch (SQLException ex) {
-            Logger.getLogger(Consultas.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConsultasFactura.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         int diasSeleccionados = 1; // Valor predeterminado
@@ -246,7 +246,7 @@ public class Consultas extends javax.swing.JFrame {
         try {
             FiltroDias();
         } catch (SQLException ex) {
-            Logger.getLogger(Consultas.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConsultasFactura.class.getName()).log(Level.SEVERE, null, ex);
         }
         int diasSeleccionados = 1; // Valor predeterminado
         switch(CbxFiltroDias.getSelectedIndex()) {
@@ -273,7 +273,7 @@ public class Consultas extends javax.swing.JFrame {
         try {
             FiltroDias();
         } catch (SQLException ex) {
-            Logger.getLogger(Consultas.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConsultasFactura.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         int diasSeleccionados = 1; // Valor predeterminado
@@ -317,20 +317,21 @@ public class Consultas extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Consultas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ConsultasFactura.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Consultas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ConsultasFactura.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Consultas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ConsultasFactura.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Consultas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ConsultasFactura.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Consultas().setVisible(true);
+                new ConsultasFactura().setVisible(true);
             }
         });
     }
