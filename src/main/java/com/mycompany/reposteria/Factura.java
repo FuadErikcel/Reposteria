@@ -698,6 +698,7 @@ DefaultTableModel model;
             insertFacC();
             try {
                 insertFacP();
+                limpiar();
             } catch (SQLException ex) {
                 Logger.getLogger(Factura.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -705,6 +706,7 @@ DefaultTableModel model;
            insertFactura();
            try {
                 insertFacP();
+                limpiar();
             } catch (SQLException ex) {
                 Logger.getLogger(Factura.class.getName()).log(Level.SEVERE, null, ex);
             }
