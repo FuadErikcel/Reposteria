@@ -124,31 +124,30 @@ public class Consultas extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void dateFechaAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_dateFechaAncestorAdded
-
-    }//GEN-LAST:event_dateFechaAncestorAdded
-
-    private void dateFechaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dateFechaFocusLost
-      
-      
-    }//GEN-LAST:event_dateFechaFocusLost
-
-    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-     
-         if(cbxFiltro.getSelectedIndex()==0){
-             mostrarFecha();
-         }else if(cbxFiltro.getSelectedIndex()==1){
-           last30days();  
-         }
-    }//GEN-LAST:event_btnBuscarActionPerformed
-
     private void txtProveedorKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtProveedorKeyTyped
         buscarProveedor();
     }//GEN-LAST:event_txtProveedorKeyTyped
 
     private void txtProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProveedorActionPerformed
-       // buscarProveedor();
+        // buscarProveedor();
     }//GEN-LAST:event_txtProveedorActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+
+        if(cbxFiltro.getSelectedIndex()==0){
+            mostrarFecha();
+        }else if(cbxFiltro.getSelectedIndex()==1){
+            last30days();
+        }
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void dateFechaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dateFechaFocusLost
+
+    }//GEN-LAST:event_dateFechaFocusLost
+
+    private void dateFechaAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_dateFechaAncestorAdded
+
+    }//GEN-LAST:event_dateFechaAncestorAdded
 
     private void cbxFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxFiltroActionPerformed
         if(cbxFiltro.getSelectedIndex()==0){
@@ -156,7 +155,7 @@ public class Consultas extends javax.swing.JFrame {
             lbFecha2.setVisible(false);
             dateFecha2.setVisible(false);
             txtProveedor.setVisible(false);
-              lbFecha.setVisible(true);
+            lbFecha.setVisible(true);
             dateFecha.setVisible(true);
         }else if(cbxFiltro.getSelectedIndex()==2){
             btnBuscar.setVisible(false);
@@ -173,9 +172,9 @@ public class Consultas extends javax.swing.JFrame {
             lbFecha2.setVisible(false);
             dateFecha2.setVisible(false);
             btnBuscar.setVisible(false);
-             txtProveedor.setVisible(true);
+            txtProveedor.setVisible(true);
         }else if (cbxFiltro.getSelectedIndex()==1){
-             lbFecha.setVisible(true);
+            lbFecha.setVisible(true);
             dateFecha.setVisible(true);
             lbFecha2.setVisible(true);
             dateFecha2.setVisible(true);
@@ -223,7 +222,27 @@ public class Consultas extends javax.swing.JFrame {
         java.util.Date fecha = dateFecha.getDate();
         java.sql.Date fechaElaboracion = new java.sql.Date(fecha.getTime());
         try{
-            String consultaSQL = "SELECT * FROM producto WHERE fechaelaboracion = ? ";
+            String consultaSQL =  "SELECT \n" +
+                                                "    producto.*,\n" +
+                                                "    CASE \n" +
+                                                "        WHEN galletas.tipo IS NOT NULL THEN 'Galleta'\n" +
+                                                "        WHEN pan.tipo IS NOT NULL THEN 'Pan'\n" +
+                                                "        WHEN pnormal.idpastelnormal IS NOT NULL THEN 'Pastel Normal'\n" +
+                                                "        WHEN ppersonalizado.idppersonalizado IS NOT NULL THEN 'Pastel Personalizado'\n" +
+                                                "        ELSE 'Tipo desconocido'\n" +
+                                                "    END AS tipo_producto\n" +
+                                                "FROM \n" +
+                                                "    producto\n" +
+                                                "LEFT JOIN \n" +
+                                                "    galletas ON producto.idproducto = galletas.idgalletas\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pnormal ON producto.idproducto = pnormal.idpastelnormal\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pan ON producto.idproducto = pan.idpan\n" +
+                                                "LEFT JOIN \n" +
+                                                "    ppersonalizado ON producto.idproducto = ppersonalizado.idppersonalizado\n" +
+                                                "WHERE \n" +
+                                                "    producto.fechaelaboracion = ?;";
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setDate(1, (java.sql.Date) fechaElaboracion);
 
@@ -231,12 +250,14 @@ public class Consultas extends javax.swing.JFrame {
             
             DefaultTableModel modeloTabla = new DefaultTableModel();
             modeloTabla.addColumn("ID");
+            modeloTabla.addColumn("Producto");
             modeloTabla.addColumn("Precio");
             modeloTabla.addColumn("Fecha de Elaboración");
             
             while (resultSet.next()) {
                 Object[] fila = {
                         resultSet.getString("idproducto"),
+                        resultSet.getString("tipo_producto"),
                         resultSet.getString("precioproducto"),
                         resultSet.getString("fechaelaboracion")
                 };
@@ -259,7 +280,29 @@ public class Consultas extends javax.swing.JFrame {
         java.sql.Date fecha22 = new java.sql.Date(fecha2.getTime());
 
         try{
-            String consultaSQL = "SELECT * FROM producto WHERE fechaelaboracion BETWEEN ? AND ? ";
+            String consultaSQL = "SELECT \n" +
+                                                "    producto.idproducto, \n" +
+                                                "    producto.precioproducto, \n" +
+                                                "    producto.fechaelaboracion, \n" +
+                                                "    CASE \n" +
+                                                "        WHEN galletas.tipo IS NOT NULL THEN 'Galleta'\n" +
+                                                "        WHEN pan.tipo IS NOT NULL THEN 'Pan'\n" +
+                                                "        WHEN pnormal.idpastelnormal IS NOT NULL THEN 'Pastel Normal'\n" +
+                                                "        WHEN ppersonalizado.idppersonalizado IS NOT NULL THEN 'Pastel Personalizado'\n" +
+                                                "        ELSE 'Tipo desconocido'\n" +
+                                                "    END AS tipo_producto\n" +
+                                                "FROM \n" +
+                                                "    producto\n" +
+                                                "LEFT JOIN \n" +
+                                                "    galletas ON producto.idproducto = galletas.idgalletas\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pnormal ON producto.idproducto = pnormal.idpastelnormal\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pan ON producto.idproducto = pan.idpan\n" +
+                                                "LEFT JOIN \n" +
+                                                "    ppersonalizado ON producto.idproducto = ppersonalizado.idppersonalizado\n" +
+                                                "WHERE \n" +
+                                                "    producto.fechaelaboracion BETWEEN ? AND ?;";
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setDate(1, (java.sql.Date) fecha1);
             statement.setDate(2, (java.sql.Date) fecha22);
@@ -269,12 +312,14 @@ public class Consultas extends javax.swing.JFrame {
             
             DefaultTableModel modeloTabla = new DefaultTableModel();
             modeloTabla.addColumn("ID");
+            modeloTabla.addColumn("Producto");
             modeloTabla.addColumn("Precio");
             modeloTabla.addColumn("Fecha de Elaboración");
             
             while (resultSet.next()) {
                 Object[] fila = {
                         resultSet.getString("idproducto"),
+                        resultSet.getString("tipo_producto"),
                         resultSet.getString("precioproducto"),
                         resultSet.getString("fechaelaboracion")
                 };
@@ -292,20 +337,44 @@ public class Consultas extends javax.swing.JFrame {
     
     public void last30days(){
                 try{
-            String consultaSQL = "SELECT * FROM producto WHERE fechaelaboracion >= CURRENT_DATE - INTERVAL '30 days '"
-                                                + "AND fechaelaboracion <= CURRENT_DATE";
+            String consultaSQL = "SELECT \n" +
+                                                "    producto.idproducto, \n" +
+                                                "    producto.precioproducto, \n" +
+                                                "    producto.fechaelaboracion, \n" +
+                                                "    CASE \n" +
+                                                "        WHEN galletas.tipo IS NOT NULL THEN 'Galleta'\n" +
+                                                "        WHEN pan.tipo IS NOT NULL THEN 'Pan'\n" +
+                                                "		WHEN pnormal.idpastelnormal IS NOT NULL THEN 'Pastel Normal'\n" +
+                                                "        WHEN ppersonalizado.idppersonalizado IS NOT NULL THEN 'Pastel Personalizado'\n" +
+                                                "        ELSE 'Tipo desconocido'\n" +
+                                                "    END AS tipo_producto\n" +
+                                                "FROM \n" +
+                                                "    producto\n" +
+                                                "LEFT JOIN \n" +
+                                                "    galletas ON producto.idproducto = galletas.idgalletas\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pnormal ON producto.idproducto = pnormal.idpastelnormal\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pan ON producto.idproducto = pan.idpan\n" +
+                                                "LEFT JOIN \n" +
+                                                "    ppersonalizado ON producto.idproducto = ppersonalizado.idppersonalizado\n" +
+                                                "WHERE \n" +
+                                                "    producto.fechaelaboracion >= CURRENT_DATE - INTERVAL '30 days'\n" +
+                                                "    AND producto.fechaelaboracion <= CURRENT_DATE;";
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
             ResultSet resultSet = statement.executeQuery();
             
             DefaultTableModel modeloTabla = new DefaultTableModel();
             modeloTabla.addColumn("ID");
+            modeloTabla.addColumn("Producto");
             modeloTabla.addColumn("Precio");
             modeloTabla.addColumn("Fecha de Elaboración");
             
             while (resultSet.next()) {
                 Object[] fila = {
                         resultSet.getString("idproducto"),
+                        resultSet.getString("tipo_producto"),
                         resultSet.getString("precioproducto"),
                         resultSet.getString("fechaelaboracion")
                 };
@@ -323,19 +392,41 @@ public class Consultas extends javax.swing.JFrame {
     
     public void orderdesc(){
           try{
-            String consultaSQL = "SELECT * FROM producto ORDER BY fechaelaboracion DESC";
+            String consultaSQL = "SELECT \n" +
+                                                "    producto.*,\n" +
+                                                "    CASE \n" +
+                                                "        WHEN galletas.tipo IS NOT NULL THEN 'Galleta'\n" +
+                                                "        WHEN pan.tipo IS NOT NULL THEN 'Pan'\n" +
+                                                "        WHEN pnormal.idpastelnormal IS NOT NULL THEN 'Pastel Normal'\n" +
+                                                "        WHEN ppersonalizado.idppersonalizado IS NOT NULL THEN 'Pastel Personalizado'\n" +
+                                                "        ELSE 'Tipo desconocido'\n" +
+                                                "    END AS tipo_producto\n" +
+                                                "FROM \n" +
+                                                "    producto\n" +
+                                                "LEFT JOIN \n" +
+                                                "    galletas ON producto.idproducto = galletas.idgalletas\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pnormal ON producto.idproducto = pnormal.idpastelnormal\n" +
+                                                "LEFT JOIN \n" +
+                                                "    pan ON producto.idproducto = pan.idpan\n" +
+                                                "LEFT JOIN \n" +
+                                                "    ppersonalizado ON producto.idproducto = ppersonalizado.idppersonalizado\n" +
+                                                "ORDER BY \n" +
+                                                "    producto.fechaelaboracion DESC;";
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
             ResultSet resultSet = statement.executeQuery();
             
             DefaultTableModel modeloTabla = new DefaultTableModel();
             modeloTabla.addColumn("ID");
+            modeloTabla.addColumn("Producto");
             modeloTabla.addColumn("Precio");
             modeloTabla.addColumn("Fecha de Elaboración");
             
             while (resultSet.next()) {
                 Object[] fila = {
                         resultSet.getString("idproducto"),
+                        resultSet.getString("tipo_producto"),
                         resultSet.getString("precioproducto"),
                         resultSet.getString("fechaelaboracion")
                 };
@@ -390,7 +481,7 @@ public class Consultas extends javax.swing.JFrame {
         String proveedor = txtProveedor.getText();
          
         try{
-            String consultaSQL = "SELECT idproveedor, nombre, contacto, detalles FROM proveedores WHERE nombre LIKE ?" ;
+            String consultaSQL = "SELECT idproveedor, nombre, contacto, detalles FROM proveedores WHERE nombre ILIKE ?" ;
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setString(1, "%"+proveedor+"%");
 
