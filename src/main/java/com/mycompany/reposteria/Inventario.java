@@ -39,7 +39,7 @@ public class Inventario extends javax.swing.JFrame {
             
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
-            statement.setString(1, identidad  );
+            statement.setString(1, identidad);
             
             ResultSet resultSet = statement.executeQuery();
             
