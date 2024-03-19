@@ -1,6 +1,8 @@
 package com.mycompany.reposteria;
 
-//import com.mycompany.reposteria.Conexion;
+//package com.mycompany.reposteria;
+
+import com.mycompany.reposteria.Conexion;
 //import com.mycompany.reposteriac.Conexion;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -333,6 +335,141 @@ public void mostrarTablaPersonal() {
 }
 
 
+public void modificardatos() {
+    String identidad = txtID1.getText();
+
+    if (cbmPersona.getSelectedIndex() == 0) {
+        // Actualizar datos de cliente
+        String direccion = txtdireccion1.getText();
+        try {
+            String consultaUpdate = "UPDATE cliente SET direccion = ? WHERE idcliente = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+            statement.setString(1, direccion);
+            statement.setString(2, identidad);
+
+            int filasActualizadas = statement.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Datos del cliente actualizados correctamente");
+                txtdireccion1.setText("");
+                mostrarTablaCliente();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningun cliente con esta identidad proporcionada");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar datos de cliente: " + ex.getMessage());
+        }
+    } else if (cbmPersona.getSelectedIndex() == 1) {
+        // Actualizar datos de personal
+        String puesto = cbmPuesto.getSelectedItem().toString();
+        
+
+        try {
+            String consultaUpdate = "UPDATE personal SET puesto = ? WHERE idpersonal = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
+            statement.setString(1, puesto);
+            statement.setString(2, identidad);
+
+            int filasActualizadas = statement.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(this, "Datos de personal actualizados correctamente");
+                txtID1.setText("");
+                mostrarTablaPersonal();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ningún personal con la identidad proporcionada");
+            }
+
+            statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al actualizar datos de personal: " + ex.getMessage());
+        }
+    
+    }
+    
+}
+
+
+public void deleteperson(){
+    String identidad  = txtID1.getText();
+    try{
+        String consultaDelete = "DELETE FROM persona WHERE idpersona = ?";
+        PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+        statement.setString(1, identidad);
+        
+        int filasEliminadas = statement.executeUpdate();
+
+        if (filasEliminadas > 0) {
+            txtID1.setText("");
+            txtnombre1.setText("");
+            txtcorreo1.setText("");
+            txtcontacto1.setText("");
+        }
+       statement.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al eliminar persona: " + ex.getMessage());
+    }
+}
+public void eliminarPersonal(){
+    String identidad = txtID1.getText();
+    
+    if(cbmPersona.getSelectedIndex() == 0){
+        try{
+            String consultaDelete = "DELETE FROM cliente Where idcliente = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+            statement.setString(1, identidad);
+            
+            int filasEliminadas = statement.executeUpdate();
+            
+             if (filasEliminadas > 0) {
+                deleteperson();
+                JOptionPane.showMessageDialog(this, "Cliente eliminada correctamente");
+                txtID1.setText("");
+                txtdireccion1.setText("");
+                mostrarTablaCliente();
+        }else {
+                 JOptionPane.showMessageDialog(this, "No se encontró ninguna cliente con el la identidad proporcionada"); 
+             }
+               statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar cliente: " + ex.getMessage());
+        }
+    } else if (cbmPersona.getSelectedIndex() == 1){
+              try{
+            String consultaDelete = "DELETE FROM personal Where idpersonal = ?";
+            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
+            statement.setString(1, identidad);
+            
+            int filasEliminadas = statement.executeUpdate();
+            
+             if (filasEliminadas > 0) {
+                deleteperson();
+                JOptionPane.showMessageDialog(this, "Personal eliminada correctamente");
+                txtID1.setText("");
+                txtsalarios1.setText("");
+                cbmPuesto.setSelectedIndex(-1);
+                mostrarTablaPersonal();
+        }else {
+                 JOptionPane.showMessageDialog(this, "No se encontró ninguna personal con el la identidad proporcionada"); 
+             }
+               statement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar personal: " + ex.getMessage());
+        }  
+    }
+}
+
+
+
+    
+
          
 
 
@@ -380,6 +517,7 @@ public void mostrarTablaPersonal() {
         cbmPuesto = new javax.swing.JComboBox<>();
         btnBuscar = new javax.swing.JButton();
         JBmodificar = new javax.swing.JButton();
+        btndelete = new javax.swing.JButton();
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 51, 51));
@@ -459,6 +597,12 @@ public void mostrarTablaPersonal() {
         lbdireccion.setForeground(new java.awt.Color(51, 51, 51));
         lbdireccion.setText("Direccion:");
 
+        txtdireccion1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtdireccion1ActionPerformed(evt);
+            }
+        });
+
         lbsalario.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         lbsalario.setForeground(new java.awt.Color(51, 51, 51));
         lbsalario.setText("Salarios:");
@@ -519,6 +663,13 @@ public void mostrarTablaPersonal() {
             }
         });
 
+        btndelete.setText("Eliminar");
+        btndelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btndeleteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -537,17 +688,17 @@ public void mostrarTablaPersonal() {
                                         .addComponent(lbcorreo, javax.swing.GroupLayout.Alignment.LEADING)))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtcontacto1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtID1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(91, 91, 91)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(btnGuardar)
-                                            .addComponent(btnBuscar)
-                                            .addComponent(JBmodificar)))))
+                                    .addComponent(txtID1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtcontacto1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(91, 91, 91)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(btndelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(JBmodificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -582,19 +733,24 @@ public void mostrarTablaPersonal() {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnBuscar))
+                            .addComponent(txtnombre1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(JBmodificar))
+                            .addComponent(txtcorreo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbcontacto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtcontacto1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtID1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnGuardar)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtID1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnGuardar))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBuscar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(JBmodificar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btndelete)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbmPersona, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -677,42 +833,16 @@ public void mostrarTablaPersonal() {
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void JBmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JBmodificarActionPerformed
-    String identidad = txtID1.getText();
-    String nombre = txtnombre1.getText();
-    String correo = txtcorreo1.getText();
-    String contacto = txtcontacto1.getText();
-    String direccion = txtdireccion1.getText();
-//    String salarios = txtsalarios1.getText();
-//    String puesto = cbmPuesto.getSelectedItem().toString();
-
-    // Verificar si el campo de identidad está vacío
-    if(identidad.isEmpty()){
-        JOptionPane.showMessageDialog(this, "Por favor ingrese la identidad del cliente a actualizar");
-            return;
-    }
-    try{
-        String consultaUpdate = "UPDATE cliente SET nombre = ?, correo = ?, contacto = ?, direccion = ? WHERE idcliente = ?" ;
-        PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
-         statement.setString(1, identidad);
-         statement.setString(2, nombre);
-         statement.setString(3, correo);
-         statement.setString(4, contacto);
-         statement.setString(5, direccion);
-         
-         int filasActualizadas = statement.executeUpdate();
-         if (filasActualizadas > 0) {
-                JOptionPane.showMessageDialog(this, "Cliente actualizado correctamente");
-                limpiarCampos();
-                mostrarTablaCliente();
-        }else {
-                JOptionPane.showMessageDialog(this, "No se encontró ningún cliente con la identidad proporionada");
-            }
-          statement.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al actualizar cliente: " + ex.getMessage());
-        }
+      modificardatos();
     }//GEN-LAST:event_JBmodificarActionPerformed
+
+    private void txtdireccion1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtdireccion1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtdireccion1ActionPerformed
+
+    private void btndeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btndeleteActionPerformed
+        eliminarPersonal();
+    }//GEN-LAST:event_btndeleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -754,6 +884,7 @@ public void mostrarTablaPersonal() {
     private javax.swing.JTable Tabla;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btndelete;
     private javax.swing.JComboBox<String> cbmPersona;
     private javax.swing.JComboBox<String> cbmPuesto;
     private javax.swing.JLabel jLabel1;
