@@ -7,6 +7,7 @@ com\mycompany\reposteria\PastelesPersonalizados$7.class
 com\mycompany\reposteria\Productos$1.class
 com\mycompany\reposteria\ConsultasFactura.class
 com\mycompany\reposteria\Person$6.class
+com\mycompany\reposteria\ConsultasFactura$6.class
 com\mycompany\reposteria\Factura$3.class
 com\mycompany\reposteria\Factura$11.class
 com\mycompany\reposteria\Productos$11.class
@@ -42,6 +43,7 @@ com\mycompany\reposteria\Inventario$4.class
 com\mycompany\reposteria\Person$4.class
 com\mycompany\reposteria\Productos$10.class
 com\mycompany\reposteria\Factura$5.class
+com\mycompany\reposteria\ConsultasFactura$5.class
 com\mycompany\reposteria\PastelesPersonalizados.class
 com\mycompany\reposteria\ConsultasFactura$1.class
 com\mycompany\reposteria\Factura$13.class
