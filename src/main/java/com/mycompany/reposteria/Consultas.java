@@ -180,6 +180,14 @@ public class Consultas extends javax.swing.JFrame {
             dateFecha2.setVisible(true);
             btnBuscar.setVisible(true);
             txtProveedor.setVisible(false);
+        }else if(cbxFiltro.getSelectedIndex()==5){
+            lbFecha.setVisible(false);
+            dateFecha.setVisible(false);
+            lbFecha2.setVisible(false);
+            dateFecha2.setVisible(false);
+            btnBuscar.setVisible(false);
+            txtProveedor.setVisible(false);
+            fechaVencimiento();
         }
     }//GEN-LAST:event_cbxFiltroActionPerformed
 
@@ -500,6 +508,60 @@ public class Consultas extends javax.swing.JFrame {
                         resultSet.getString("nombre"),
                         resultSet.getString("contacto"),
                         resultSet.getString("detalles")
+
+                };
+                modeloTabla.addRow(fila);
+            }
+
+            tablaFechas.setModel(modeloTabla);
+
+            statement.close();
+            
+        }catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
+        }
+    }
+    
+    public void fechaVencimiento(){
+        try{
+            String consultaSQL = "SELECT \n" +
+                                                "    idpan AS idproducto,\n" +
+                                                "    tipo,\n" +
+                                                "    fechavencimiento AS vencimiento,\n" +
+                                                "    CASE \n" +
+                                                "        WHEN fechavencimiento < CURRENT_DATE THEN 'Producto Vencido'\n" +
+                                                "        ELSE (fechavencimiento - CURRENT_DATE) || ' Días Restantes'\n" +
+                                                "    END AS estado\n" +
+                                                "FROM \n" +
+                                                "    pan\n" +
+                                                "UNION ALL\n" +
+                                                "SELECT \n" +
+                                                "    idgalletas AS idproducto,\n" +
+                                                "    tipo,\n" +
+                                                "    fechavencimiento AS vencimiento,\n" +
+                                                "    CASE \n" +
+                                                "        WHEN fechavencimiento < CURRENT_DATE THEN 'Producto Vencido'\n" +
+                                                "        ELSE (fechavencimiento - CURRENT_DATE) || ' Días Restantes'\n" +
+                                                "    END AS estado\n" +
+                                                "FROM \n" +
+                                                "    galletas;";
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+
+            ResultSet resultSet = statement.executeQuery();
+            
+            DefaultTableModel modeloTabla = new DefaultTableModel();
+            modeloTabla.addColumn("ID");
+            modeloTabla.addColumn("Tipo");
+            modeloTabla.addColumn("Fecha de Vencimiento");
+            modeloTabla.addColumn("Estado");
+
+            
+            while (resultSet.next()) {
+                Object[] fila = {
+                        resultSet.getString("idproducto"),
+                        resultSet.getString("tipo"),
+                        resultSet.getString("vencimiento"),
+                        resultSet.getString("estado")
 
                 };
                 modeloTabla.addRow(fila);
