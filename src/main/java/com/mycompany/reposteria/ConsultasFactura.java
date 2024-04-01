@@ -27,8 +27,8 @@ public class ConsultasFactura extends javax.swing.JFrame {
      */
     public ConsultasFactura() {
         initComponents();
-        CbxConsultas.setSelectedIndex(0); 
-        CbxConsultas.revalidate(); 
+        CbxConsultas.setSelectedIndex(0);
+        CbxConsultas.revalidate();
         mostrarDatos();
         Visible();
     }
@@ -37,30 +37,47 @@ public class ConsultasFactura extends javax.swing.JFrame {
     
     private void mostrarDatos() {
         try {
-            String consultaSQL = "SELECT * FROM factura";
+            String consultaSQL = "SELECT factura.idFactura, " +
+                                 "factura.FechaVenta, " +
+                                 "COALESCE(persona.nombre, 'N/A') AS nombre_cliente, " +
+                                 "SUM(facturaProducto.cantidad * producto.precioProducto) AS total " +
+                                 "FROM factura " +
+                                 "LEFT JOIN facturaCliente ON factura.idFactura = facturaCliente.idFacturaC " +
+                                 "LEFT JOIN persona ON facturaCliente.idClienteF = persona.idPersona " +
+                                 "INNER JOIN facturaProducto ON factura.idFactura = facturaProducto.idFacturaP " +
+                                 "INNER JOIN producto ON facturaProducto.idProductoF = producto.idProducto " +
+                                 "GROUP BY factura.idFactura, factura.FechaVenta, nombre_cliente";
+
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             ResultSet resultSet = statement.executeQuery();
 
+            double totalSuma = 0;
+            
             // Limpiar tabla
             DefaultTableModel modelo = new DefaultTableModel();
             modelo.addColumn("ID");
             modelo.addColumn("Fecha Venta");
+            modelo.addColumn("Nombre Cliente");
+            modelo.addColumn("Total");
 
-            // Llenar tabla con resultados de la consulta
             while (resultSet.next()) {
                 Object[] fila = {
-                    resultSet.getString("idfactura"),
-                    resultSet.getString("fechaventa"),
+                    resultSet.getString("idFactura"),
+                    resultSet.getString("FechaVenta"),
+                    resultSet.getString("nombre_cliente"),
+                    resultSet.getDouble("total")
                 };
                 modelo.addRow(fila);
+                totalSuma += resultSet.getDouble("total");
             }
-                Tabla.setModel(modelo);
-
-                statement.close();
+            Tabla.setModel(modelo);
+            TotalTxt.setText(Double.toString(totalSuma));
+            statement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
 
     private void mostrarFacturasPorFecha() {
         try {
@@ -74,8 +91,20 @@ public class ConsultasFactura extends javax.swing.JFrame {
             java.sql.Date fechaInicioSQL = new java.sql.Date(fechaInicioSeleccionada.getTime());
             java.sql.Date fechaFinSQL = new java.sql.Date(fechaFinSeleccionada.getTime());
 
-            String consulta = "SELECT * FROM factura WHERE fechaventa BETWEEN ? AND ?";
-            PreparedStatement statement = conexion.prepareStatement(consulta);
+            String consultaSQL = "SELECT factura.idFactura, factura.FechaVenta, " + 
+                                 "CASE " +
+                                 "WHEN facturaCliente.idClienteF IS NOT NULL THEN COALESCE(persona.nombre, 'N/A') " +
+                                 " ELSE 'N/A' " +
+                                 "END AS nombre_cliente, " +
+                                 "SUM(facturaProducto.cantidad * producto.precioProducto) AS total " +
+                                 "FROM factura " +
+                                 "INNER JOIN facturaProducto ON factura.idFactura = facturaProducto.idFacturaP " +
+                                 "INNER JOIN producto ON facturaProducto.idProductoF = producto.idProducto " +
+                                 "LEFT JOIN facturaCliente ON factura.idFactura = facturaCliente.idFacturaC " +
+                                 "LEFT JOIN persona ON facturaCliente.idClienteF = persona.idPersona " +
+                                 "WHERE factura.FechaVenta BETWEEN ? AND ? " +
+                                 "GROUP BY factura.idFactura, factura.FechaVenta, nombre_cliente";
+            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setDate(1, fechaInicioSQL);
             statement.setDate(2, fechaFinSQL);
             ResultSet resultSet = statement.executeQuery();
@@ -84,16 +113,24 @@ public class ConsultasFactura extends javax.swing.JFrame {
             DefaultTableModel modelo = new DefaultTableModel();
             modelo.addColumn("ID");
             modelo.addColumn("Fecha Venta");
-
+            modelo.addColumn("Cliete");
+            modelo.addColumn("Total");
+            
+            double totalSuma = 0;
+            
             // Llenar tabla con resultados de la consulta
             while (resultSet.next()) {
                 Object[] fila = {
                     resultSet.getString("idfactura"),
                     resultSet.getString("fechaventa"),
+                    resultSet.getString("nombre_cliente"),
+                    resultSet.getString("total")
                 };
                 modelo.addRow(fila);
+                totalSuma += resultSet.getDouble("total");
             }
             Tabla.setModel(modelo);
+            TotalTxt.setText(Double.toString(totalSuma));
             statement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -113,7 +150,19 @@ public class ConsultasFactura extends javax.swing.JFrame {
             cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH)); // Último día del mes
             java.sql.Date fechaFinSQL = new java.sql.Date(cal.getTimeInMillis());
             
-            String consulta = "SELECT * FROM factura WHERE EXTRACT(YEAR FROM fechaventa) = ? AND EXTRACT(MONTH FROM fechaventa) = ?";
+            String consulta = "SELECT factura.idFactura, " +
+                              "factura.FechaVenta, " +
+                              "COALESCE(persona.nombre, 'N/A') AS nombre_cliente, " +
+                              "SUM(facturaProducto.cantidad * producto.precioProducto) AS total " +
+                              "FROM factura " +
+                              "LEFT JOIN facturaCliente ON factura.idFactura = facturaCliente.idFacturaC " +
+                              "LEFT JOIN persona ON facturaCliente.idClienteF = persona.idPersona " +
+                              "INNER JOIN facturaProducto ON factura.idFactura = facturaProducto.idFacturaP " +
+                              "INNER JOIN producto ON facturaProducto.idProductoF = producto.idProducto " +
+                              "WHERE EXTRACT(YEAR FROM factura.FechaVenta) = ? " +
+                              "AND EXTRACT(MONTH FROM factura.FechaVenta) = ? " +
+                              "GROUP BY factura.idFactura, factura.FechaVenta, nombre_cliente";
+            
             PreparedStatement statement = conexion.prepareStatement(consulta);
             statement.setInt(1, añoSeleccionado);
             statement.setInt(2, mesSeleccionado);
@@ -122,15 +171,23 @@ public class ConsultasFactura extends javax.swing.JFrame {
             DefaultTableModel modelo = new DefaultTableModel();
             modelo.addColumn("ID");
             modelo.addColumn("Fecha Venta");
+            modelo.addColumn("Nombre Cliente");
+            modelo.addColumn("Total");
+            
+            double totalSuma = 0;
             
             while (resultSet.next()) {
                 Object[] fila = {
                     resultSet.getString("idfactura"),
                     resultSet.getString("fechaventa"),
+                    resultSet.getString("nombre_cliente"),
+                    resultSet.getDouble("total")
                 };
                 modelo.addRow(fila);
+                totalSuma += resultSet.getDouble("total");
             }
             Tabla.setModel(modelo);
+            TotalTxt.setText(Double.toString(totalSuma));
             statement.close();
         }catch (SQLException ex) {
             ex.printStackTrace();
@@ -159,7 +216,18 @@ public class ConsultasFactura extends javax.swing.JFrame {
             java.sql.Date fechaFinSQL = new java.sql.Date(cal.getTimeInMillis());
 
             // Consulta SQL para seleccionar facturas en el rango de fechas del año
-            String consulta = "SELECT * FROM factura WHERE fechaventa BETWEEN ? AND ?";
+            String consulta = "SELECT factura.idFactura, " +
+                              "factura.FechaVenta, " +
+                              "COALESCE(persona.nombre, 'N/A') AS nombre_cliente, " +
+                              "SUM(facturaProducto.cantidad * producto.precioProducto) AS total " +
+                              "FROM factura " +
+                              "LEFT JOIN facturaCliente ON factura.idFactura = facturaCliente.idFacturaC " +
+                              "LEFT JOIN persona ON facturaCliente.idClienteF = persona.idPersona " +
+                              "INNER JOIN facturaProducto ON factura.idFactura = facturaProducto.idFacturaP " +
+                              "INNER JOIN producto ON facturaProducto.idProductoF = producto.idProducto " +
+                              "WHERE factura.FechaVenta BETWEEN ? AND ? " +
+                              "GROUP BY factura.idFactura, factura.FechaVenta, nombre_cliente";
+
             PreparedStatement statement = conexion.prepareStatement(consulta);
             statement.setDate(1, fechaInicioSQL);
             statement.setDate(2, fechaFinSQL);
@@ -169,32 +237,47 @@ public class ConsultasFactura extends javax.swing.JFrame {
             DefaultTableModel modelo = new DefaultTableModel();
             modelo.addColumn("ID");
             modelo.addColumn("Fecha Venta");
+            modelo.addColumn("Nombre Cliente");
+            modelo.addColumn("Total");
+
+            double totalSuma = 0;
 
             // Llenar tabla con resultados de la consulta
             while (resultSet.next()) {
                 Object[] fila = {
                     resultSet.getString("idfactura"),
                     resultSet.getString("fechaventa"),
+                    resultSet.getString("nombre_cliente"),
+                    resultSet.getDouble("total")
                 };
                 modelo.addRow(fila);
+                totalSuma += resultSet.getDouble("total");
             }
             Tabla.setModel(modelo);
+            TotalTxt.setText(Double.toString(totalSuma)); // Establecer el total en el JTextField TotalTxt
             statement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
     
     private void buscarFacturasPorCliente() {
         try {
             String nombreCliente = txtCliente.getText();
-            
-            String consultaSQL = "SELECT factura.idfactura, persona.nombre AS nombreCliente, factura.fechaventa " +
-                                "FROM factura " +
-                                "INNER JOIN facturaCliente ON factura.idfactura = facturaCliente.idfacturac " +
-                                "INNER JOIN cliente ON facturaCliente.idclientef = cliente.idcliente " +
-                                "INNER JOIN persona ON cliente.idcliente = persona.idpersona " +
-                                "WHERE persona.nombre ILIKE ?";
+
+            String consultaSQL = "SELECT factura.idFactura, " +
+                                 "persona.nombre AS nombreCliente, " +
+                                 "factura.FechaVenta, " +
+                                 "SUM(facturaProducto.cantidad * producto.precioProducto) AS total " +
+                                 "FROM factura " +
+                                 "INNER JOIN facturaCliente ON factura.idFactura = facturaCliente.idFacturaC " +
+                                 "INNER JOIN persona ON facturaCliente.idClienteF = persona.idPersona " +
+                                 "INNER JOIN facturaProducto ON factura.idFactura = facturaProducto.idFacturaP " +
+                                 "INNER JOIN producto ON facturaProducto.idProductoF = producto.idProducto " +
+                                 "WHERE persona.nombre ILIKE ? " +
+                                 "GROUP BY factura.idFactura, persona.nombre, factura.FechaVenta";
+
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setString(1, "%" + nombreCliente + "%");
             ResultSet resultSet = statement.executeQuery();
@@ -204,29 +287,45 @@ public class ConsultasFactura extends javax.swing.JFrame {
             modelo.addColumn("ID Factura");
             modelo.addColumn("Nombre Cliente");
             modelo.addColumn("Fecha Venta");
+            modelo.addColumn("Total");
 
-            // Llenar tabla con resultados de la consulta
+            double totalSuma = 0;
+
             while (resultSet.next()) {
                 Object[] fila = {
-                    resultSet.getString("idfactura"),
+                    resultSet.getString("idFactura"),
                     resultSet.getString("nombreCliente"),
-                    resultSet.getString("fechaventa")
+                    resultSet.getString("FechaVenta"),
+                    resultSet.getDouble("total")
                 };
                 modelo.addRow(fila);
+                totalSuma += resultSet.getDouble("total");
             }
             Tabla.setModel(modelo);
-
+            TotalTxt.setText(Double.toString(totalSuma)); // Establecer el total en el JTextField TotalTxt
             statement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+
     private void buscarFacturasPorFactura() {
         try {
             String idFactura = txtFactura.getText();
-            
-            String consultaSQL = "SELECT idfactura, fechaventa FROM factura WHERE idfactura ILIKE ?";
+
+            String consultaSQL = "SELECT factura.idFactura, " +
+                                 "COALESCE(persona.nombre, 'N/A') AS nombreCliente, " +
+                                 "factura.FechaVenta, " +
+                                 "SUM(facturaProducto.cantidad * producto.precioProducto) AS total " +
+                                 "FROM factura " +
+                                 "LEFT JOIN facturaCliente ON factura.idFactura = facturaCliente.idFacturaC " +
+                                 "LEFT JOIN persona ON facturaCliente.idClienteF = persona.idPersona " +
+                                 "INNER JOIN facturaProducto ON factura.idFactura = facturaProducto.idFacturaP " +
+                                 "INNER JOIN producto ON facturaProducto.idProductoF = producto.idProducto " +
+                                 "WHERE factura.idFactura ILIKE ? " +
+                                 "GROUP BY factura.idFactura, persona.nombre, factura.FechaVenta";
+
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
             statement.setString(1, "%" + idFactura + "%");
             ResultSet resultSet = statement.executeQuery();
@@ -234,23 +333,30 @@ public class ConsultasFactura extends javax.swing.JFrame {
             // Limpiar tabla
             DefaultTableModel modelo = new DefaultTableModel();
             modelo.addColumn("ID Factura");
+            modelo.addColumn("Nombre Cliente");
             modelo.addColumn("Fecha Venta");
+            modelo.addColumn("Total");
 
-            // Llenar tabla con resultados de la consulta
+            double totalSuma = 0;
+
             while (resultSet.next()) {
                 Object[] fila = {
-                    resultSet.getString("idfactura"),
-                    resultSet.getString("fechaventa")
+                    resultSet.getString("idFactura"),
+                    resultSet.getString("nombreCliente"),
+                    resultSet.getString("FechaVenta"),
+                    resultSet.getDouble("total")
                 };
                 modelo.addRow(fila);
+                totalSuma += resultSet.getDouble("total");
             }
             Tabla.setModel(modelo);
-
+            TotalTxt.setText(Double.toString(totalSuma)); // Establecer el total en el JTextField TotalTxt
             statement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
 
 
     
@@ -382,6 +488,8 @@ public class ConsultasFactura extends javax.swing.JFrame {
         txtCliente = new javax.swing.JTextField();
         lblFactura = new javax.swing.JLabel();
         txtFactura = new javax.swing.JTextField();
+        TotalTxt = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -391,7 +499,7 @@ public class ConsultasFactura extends javax.swing.JFrame {
         jLabel1.setText("Consulta Facturas");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 20, 210, 30));
 
-        CbxFiltroOrden.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Descendente", "Ascendente" }));
+        CbxFiltroOrden.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ascendente", "Descendente" }));
         CbxFiltroOrden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CbxFiltroOrdenActionPerformed(evt);
@@ -475,6 +583,17 @@ public class ConsultasFactura extends javax.swing.JFrame {
         jPanel1.add(lblFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 130, -1, -1));
         jPanel1.add(txtFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 130, 160, -1));
 
+        TotalTxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TotalTxtActionPerformed(evt);
+            }
+        });
+        jPanel1.add(TotalTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 560, 100, -1));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setText("Total:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 560, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -493,15 +612,17 @@ public class ConsultasFactura extends javax.swing.JFrame {
 
     private void CbxFiltroOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CbxFiltroOrdenActionPerformed
         String filtroOrden = (String) CbxFiltroOrden.getSelectedItem();
-        switch (filtroOrden) {
-            case "Descendente":
-                ordenarDatosTabla(false);
-                break;
-            case "Ascendente":
-                ordenarDatosTabla(true);
-                break;
-            default:
-                break;
+        if(filtroOrden != null) {
+            switch (filtroOrden) {
+                case "Descendente":
+                    ordenarDatosTabla(false);
+                    break;
+                case "Ascendente":
+                    ordenarDatosTabla(true);
+                    break;
+                default:
+                    break;
+            }
         }
     }//GEN-LAST:event_CbxFiltroOrdenActionPerformed
 
@@ -531,6 +652,10 @@ public class ConsultasFactura extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_botonBuscarActionPerformed
+
+    private void TotalTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TotalTxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TotalTxtActionPerformed
     
     /**
      * @param args the command line arguments
@@ -573,12 +698,14 @@ public class ConsultasFactura extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> CbxConsultas;
     private javax.swing.JComboBox<String> CbxFiltroOrden;
     private javax.swing.JTable Tabla;
+    private javax.swing.JTextField TotalTxt;
     private javax.swing.JButton botonBuscar;
     private com.toedter.calendar.JDateChooser fechaFin;
     private com.toedter.calendar.JDateChooser fechaInicio;
     private com.toedter.calendar.JYearChooser jAño;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private com.toedter.calendar.JMonthChooser jMes;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

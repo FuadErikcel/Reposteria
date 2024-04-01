@@ -452,8 +452,10 @@ public class Consultas extends javax.swing.JFrame {
     
     public void proximosEntregar(){
         try{
-            String consultaSQL = "SELECT idppersonalizado, detalles, ppersonalizado.fechaentrega - CURRENT_DATE AS TiempoRestante, fechaentrega\n" +
-                                               "FROM ppersonalizado";
+            String consultaSQL = "SELECT ppersonalizado.idppersonalizado, ppersonalizado.detalles, ppersonalizado.fechaentrega - CURRENT_DATE AS TiempoRestante, ppersonalizado.fechaentrega \n" +
+                                    "FROM ppersonalizado\n" +
+                                    "LEFT JOIN facturaProducto ON ppersonalizado.idppersonalizado = facturaProducto.idproductof\n" +
+                                    "WHERE facturaProducto.idproductof IS NULL;";
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
             ResultSet resultSet = statement.executeQuery();
