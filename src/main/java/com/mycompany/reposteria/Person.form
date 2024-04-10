@@ -167,11 +167,9 @@
                                   <EmptySpace min="-2" pref="91" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="btndelete" max="32767" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="JBmodificar" max="32767" attributes="0"/>
-                                          <Component id="btnBuscar" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="btnGuardar" alignment="0" max="32767" attributes="0"/>
-                                      </Group>
+                                      <Component id="JBmodificar" max="32767" attributes="0"/>
+                                      <Component id="btnBuscar" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="btnGuardar" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                               <Group type="102" attributes="0">
@@ -437,22 +435,7 @@
         <Component class="javax.swing.JComboBox" name="cbmPuesto">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="14">
-                <StringItem index="0" value="Barista"/>
-                <StringItem index="1" value="Camarero/a"/>
-                <StringItem index="2" value="Cajero/a"/>
-                <StringItem index="3" value="Cocinero/a"/>
-                <StringItem index="4" value="Auxiliar de limpieza"/>
-                <StringItem index="5" value="Gerente de Cafeter&#xed;a"/>
-                <StringItem index="6" value="Repostero/a"/>
-                <StringItem index="7" value="Barista especializado/a"/>
-                <StringItem index="8" value="Encargado/a de compras"/>
-                <StringItem index="9" value="Encargado/a de marketing"/>
-                <StringItem index="10" value="Encargado/a de recursos humanos"/>
-                <StringItem index="11" value="Encargado/a de eventos"/>
-                <StringItem index="12" value="Barista supervisor/a"/>
-                <StringItem index="13" value="Recepcionista"/>
-              </StringArray>
+              <StringArray count="0"/>
             </Property>
           </Properties>
           <AuxValues>

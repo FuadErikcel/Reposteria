@@ -31,7 +31,7 @@ public class ConsultaCliente extends javax.swing.JFrame {
     Connection conexion = conexionObjeto.getConexion();
     
     private void buscarClientes() {
-        String identidadABuscar = txtIdentidad.getText();
+        String buscar = txtIdentidad.getText();
 
         try {
             DefaultTableModel modelo = (DefaultTableModel) tablaconsulta.getModel();
@@ -39,9 +39,13 @@ public class ConsultaCliente extends javax.swing.JFrame {
 
             String query = "SELECT persona.idpersona, persona.nombre, persona.correo, persona.contacto, cliente.direccion " +
                            "FROM persona INNER JOIN cliente ON persona.idpersona = cliente.idcliente " +
-                           "WHERE persona.idpersona ILIKE ?";
+                           "WHERE persona.idpersona ILIKE ?  OR persona.nombre ILIKE ? OR persona.correo ILIKE ? OR persona.contacto ILIKE ? OR cliente.direccion ILIKE ? ";
             PreparedStatement pst = conexion.prepareStatement(query);
-            pst.setString(1, "%" + identidadABuscar + "%"); // Utilizamos % en ambos lados para buscar coincidencias parciales
+            pst.setString(1, "%" + buscar + "%"); // Utilizamos % en ambos lados para buscar coincidencias parciales
+            pst.setString(2, "%" + buscar + "%");
+            pst.setString(3, "%" + buscar + "%");
+            pst.setString(4, "%" + buscar + "%");
+            pst.setString(5, "%" + buscar + "%");
             ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
@@ -98,7 +102,7 @@ public class ConsultaCliente extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Identidad:");
+        jLabel2.setText("Busqueda");
 
         txtIdentidad.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {

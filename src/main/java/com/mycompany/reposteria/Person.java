@@ -11,6 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /*
@@ -24,25 +27,41 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Person extends javax.swing.JFrame {
   DefaultTableModel model = new DefaultTableModel();
+  private boolean opcionesSeleccionadas = false;
     /*
      * Creates new form Person
      */
+  
+   private Map<String, Integer> puestoIdMap = new HashMap<>();
+
     public Person() {
-         initComponents();
-                 if(cbmPuesto.getSelectedIndex() == 0){
-                   mostrarTablaCliente(); 
-                 }else {
-                    mostrarTablaPersonal(); 
-                 }
-             
-             
-         
-         visible();   
+ initComponents();
+
+    // Consulta SQL para obtener los nombres de los puestos desde la tabla
+    String consultaPuestos = "SELECT n_puesto FROM puesto";
+    try (PreparedStatement statement = conexion.prepareStatement(consultaPuestos)) {
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()) {
+            String nombrePuesto = rs.getString("n_puesto");
+            cbmPuesto.addItem(nombrePuesto);
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al obtener los puestos: " + ex.getMessage());
+    }
+
+    if (cbmPuesto.getSelectedIndex() == 0) {
+        mostrarTablaCliente();
+    } else {
+        mostrarTablaPersonal();
+    }
+
+    visible();  
     }
     
     Conexion conexionObjeto = new Conexion();
     Connection conexion = conexionObjeto.getConexion();
-    private boolean opcionesSeleccionadas = false;
+
 
 public void visible() {
     int index = cbmPersona.getSelectedIndex();
@@ -116,77 +135,79 @@ public void insertarDatos1() {
 }
 
 
-    
-    
-    
 public void insertDates() {
-String identidad = txtID1.getText();
-    String nombre = txtnombre1.getText();
-    String correo = txtcorreo1.getText();
-    String contacto = txtcontacto1.getText();
-    String direccion = txtdireccion1.getText();
-    String salarios = txtsalarios1.getText();
-    String puesto = cbmPuesto.getSelectedItem().toString();
- if(cbmPersona.getSelectedIndex()==0){
-    
-    try {
-        String consultaInsert = "INSERT INTO cliente(Idcliente, direccion)VALUES (?, ?)";
-        PreparedStatement statement = conexion.prepareStatement(consultaInsert);
-        statement.setString(1, identidad);
-        statement.setString(2, direccion);
+    if (cbmPersona.getSelectedIndex() == 1) {
+        try {
+            String identidad = txtID1.getText().trim();
+            String salarioString = txtsalarios1.getText().trim();
+            String nombrePuesto = cbmPuesto.getSelectedItem().toString().trim(); // Obtener el nombre del puesto seleccionado
 
-        int filasInsertadas = statement.executeUpdate();
+            if (identidad.isEmpty() || salarioString.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.");
+                return;
+            }
 
-        if (filasInsertadas > 0) {
-            JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
-            // Limpiar los campos después de la inserción exitosa
-             limpiarCampos();
-            
-            // Mostrar los datos actualizados en la tabla de cliente
-                mostrarTablaCliente();
-            
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al insertar datos");
+            // Convertir salario a Integer
+            int salario = 0;
+            try {
+                salario = Integer.parseInt(salarioString);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Error: El salario debe ser un valor entero válido.");
+                return;
+            }
+
+            // Consulta para obtener el idPuesto
+            String consultaIdPuesto = "SELECT p.idpuestopersonal " +
+                                      "FROM puesto p " +
+                                      "WHERE p.n_puesto = ?";
+
+            int idPuesto = -1;
+            try (PreparedStatement statementIdPuesto = conexion.prepareStatement(consultaIdPuesto)) {
+                statementIdPuesto.setString(1, nombrePuesto); // Asignar el nombre del puesto como una cadena de texto
+                ResultSet rsIdPuesto = statementIdPuesto.executeQuery();
+                if (rsIdPuesto.next()) {
+                    idPuesto = rsIdPuesto.getInt("idpuestopersonal");
+                    System.out.println("idpuestopersonal encontrado: " + idPuesto);
+
+                    // Ahora que tenemos el idPuesto, procedemos a insertar los datos en la tabla personal
+                    String consultaInsert = "INSERT INTO personal(idpersonal, salario, idpuestopersonal) VALUES (?, ?, ?)";
+                    try (PreparedStatement statementInsert = conexion.prepareStatement(consultaInsert)) {
+                        statementInsert.setString(1, identidad);
+                        statementInsert.setInt(2, salario);
+                        statementInsert.setInt(3, idPuesto); // Asignar el ID del puesto como un entero
+
+                        int filasInsertadas = statementInsert.executeUpdate();
+
+                        if (filasInsertadas > 0) {
+                            JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
+
+                            // Limpiar los campos después de la inserción exitosa
+                            limpiarCampos();
+                            // Mostrar los datos actualizados en la tabla de personal
+                            mostrarTablaPersonal();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Error al insertar datos");
+                        }
+                    }
+
+                } else {
+                    System.out.println("No se encontró ningún idPuesto para el puesto: " + nombrePuesto);
+                    JOptionPane.showMessageDialog(this, "No se encontró ningún idPuesto para el puesto: " + nombrePuesto);
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
         }
-        statement.close();
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this, "Error: El salario debe ser un valor numérico válido.");
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
     }
-  }else if(cbmPersona.getSelectedIndex()==1){
-      try {
-        double salario = Double.parseDouble(salarios); // Parseamos el salario a double
-
-        String consultaInsert = "INSERT INTO personal(idpersonal, salario, puesto) VALUES (?,?,?)";
-        PreparedStatement statement = conexion.prepareStatement(consultaInsert);
-        statement.setString(1, identidad);
-        statement.setDouble(2, salario);
-        statement.setString(3, puesto);
-
-
-        int filasInsertadas = statement.executeUpdate();
-
-        if (filasInsertadas > 0) {
-            JOptionPane.showMessageDialog(this, "Datos insertados correctamente");
-            
-                // Limpiar los campos después de la inserción exitosa
-                limpiarCampos();
-                // Mostrar los datos actualizados en la tabla de personal
-                mostrarTablaPersonal();
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al insertar datos");
-        }
-        statement.close();
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this, "Error: El salario debe ser un valor numérico válido.");
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error al insertar datos: " + ex.getMessage());
-    }
-  }
 }
+
+
+
+
+
+
 
 public void limpiarCampos() {
     txtID1.setText("");
@@ -205,7 +226,7 @@ public void mostrarTablaCliente() {
     try {
         String consultaSQL = "SELECT idcliente, nombre, correo, contacto, direccion " +
                              "FROM cliente " +
-                              "JOIN persona ON persona.idpersona = cliente.idcliente";
+                             "JOIN persona ON persona.idpersona = cliente.idcliente";
 
         PreparedStatement statement = conexion.prepareStatement(consultaSQL);
         ResultSet resultSet = statement.executeQuery();
@@ -236,11 +257,7 @@ public void mostrarTablaCliente() {
     }
 }
 
-
-
-
- 
- public void BuscarCliente() {
+public void BuscarCliente() {
     try {
         String identidad = txtID1.getText();
         String consultaSQL = "SELECT idcliente, nombre, correo, contacto, direccion " +
@@ -256,8 +273,6 @@ public void mostrarTablaCliente() {
             txtcorreo1.setText(resultSet.getString("correo"));
             txtcontacto1.setText(resultSet.getString("contacto"));
             txtdireccion1.setText(resultSet.getString("direccion"));
-            
-
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados para la identidad proporcionada.");
         }
@@ -267,26 +282,35 @@ public void mostrarTablaCliente() {
         JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
     }
 }
+
+
+
  
- public void BuscarPersonal(){
-     try{
-         String identidad = txtID1.getText();
-         String consultaSQL ="SELECT idpersonal, nombre, correo, contacto, salario, puesto " +
+ public void BuscarPersonal() {
+    try {
+        String identidad = txtID1.getText();
+        String consultaSQL = "SELECT persona.idpersona, persona.nombre, persona.correo, persona.contacto, personal.salario, puesto.n_puesto " +
                              "FROM personal " +
                              "JOIN persona ON personal.idpersonal = persona.idpersona " +
-                             "WHERE personal.idpersonal = ?"; 
+                             "LEFT JOIN puesto ON personal.idpuestopersonal = puesto.idpuestopersonal " +
+                             "WHERE persona.idpersona = ?";
 
-          PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+        PreparedStatement statement = conexion.prepareStatement(consultaSQL);
         statement.setString(1, identidad);
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()) {
-            txtID1.setText(resultSet.getString("idpersonal"));
+            txtID1.setText(resultSet.getString("idpersona"));
             txtnombre1.setText(resultSet.getString("nombre"));
             txtcorreo1.setText(resultSet.getString("correo"));
             txtcontacto1.setText(resultSet.getString("contacto"));
-            txtsalarios1.setText(resultSet.getString("salario"));
-            cbmPuesto.setSelectedItem(resultSet.getString("puesto"));
+            txtsalarios1.setText(String.valueOf(resultSet.getInt("salario")));
 
+            String puesto = resultSet.getString("n_puesto");
+            if (puesto != null) {
+                cbmPuesto.setSelectedItem(puesto);
+            } else {
+                cbmPuesto.setSelectedIndex(-1); // Para deseleccionar cualquier elemento previo si no hay un puesto
+            }
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados para la identidad proporcionada.");
         }
@@ -296,18 +320,21 @@ public void mostrarTablaCliente() {
         JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
     }
 }
+
 
   
 public void mostrarTablaPersonal() {
     try {
-        String consultaSQL = "SELECT idpersona, nombre, correo, contacto, salario, puesto " +
+        String consultaSQL = "SELECT personal.idpersonal, persona.nombre, persona.correo, persona.contacto, personal.salario, puesto.n_puesto " +
                              "FROM personal " +
-                             "JOIN persona ON personal.idpersonal = persona.idpersona"; // Cambiado id_persona a idpersona
+                             "LEFT JOIN persona ON personal.idpersonal = persona.idpersona " +
+                             "LEFT JOIN puesto ON personal.idpuestopersonal = puesto.idpuestopersonal";
+
         PreparedStatement statement = conexion.prepareStatement(consultaSQL);
         ResultSet resultSet = statement.executeQuery();
 
         DefaultTableModel modeloTabla = new DefaultTableModel();
-        modeloTabla.addColumn("Identidad");
+        modeloTabla.addColumn("ID Personal");
         modeloTabla.addColumn("Nombre");
         modeloTabla.addColumn("Correo");
         modeloTabla.addColumn("Contacto");
@@ -316,17 +343,18 @@ public void mostrarTablaPersonal() {
 
         while (resultSet.next()) {
             Object[] fila = {
-                resultSet.getString("idpersona"),
-                resultSet.getString("nombre"),
-                resultSet.getString("correo"),
-                resultSet.getString("contacto"),
-                resultSet.getString("salario"),
-                resultSet.getString("puesto")
+                    resultSet.getString("idpersonal"),
+                    resultSet.getString("nombre"),
+                    resultSet.getString("correo"),
+                    resultSet.getString("contacto"),
+                    resultSet.getInt("salario"),
+                    resultSet.getString("n_puesto")
             };
             modeloTabla.addRow(fila);
         }
 
-        Tabla.setModel(modeloTabla);
+        Tabla.setModel(modeloTabla); // Asignar el modelo de tabla al componente de tabla
+
         statement.close();
     } catch (SQLException ex) {
         ex.printStackTrace();
@@ -334,145 +362,112 @@ public void mostrarTablaPersonal() {
     }
 }
 
-
 public void modificardatos() {
     String identidad = txtID1.getText();
+    String nuevoNombre = txtnombre1.getText();
+    String nuevoCorreo = txtcorreo1.getText();
+    String nuevoContacto = txtcontacto1.getText();
 
-    if (cbmPersona.getSelectedIndex() == 0) {
-        // Actualizar datos de cliente
-        String direccion = txtdireccion1.getText();
-        try {
-            String consultaUpdate = "UPDATE cliente SET direccion = ? WHERE idcliente = ?";
-            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
-            statement.setString(1, direccion);
-            statement.setString(2, identidad);
-
-            int filasActualizadas = statement.executeUpdate();
-
-            if (filasActualizadas > 0) {
-                JOptionPane.showMessageDialog(this, "Datos del cliente actualizados correctamente");
-                txtdireccion1.setText("");
-                mostrarTablaCliente();
-            } else {
-                JOptionPane.showMessageDialog(this, "No se encontró ningun cliente con esta identidad proporcionada");
-            }
-
-            statement.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al actualizar datos de cliente: " + ex.getMessage());
-        }
-    } else if (cbmPersona.getSelectedIndex() == 1) {
-        // Actualizar datos de personal
-        String puesto = cbmPuesto.getSelectedItem().toString();
-        
+    if (cbmPersona.getSelectedIndex() == 1) { // Verificar si es personal
 
         try {
-            String consultaUpdate = "UPDATE personal SET puesto = ? WHERE idpersonal = ?";
-            PreparedStatement statement = conexion.prepareStatement(consultaUpdate);
-            statement.setString(1, puesto);
-            statement.setString(2, identidad);
+            // Actualizar nombre, correo y contacto en la tabla persona
+            String consultaUpdatePersona = "UPDATE persona SET nombre = ?, correo = ?, contacto = ? WHERE idpersona = ?";
+            PreparedStatement statementUpdatePersona = conexion.prepareStatement(consultaUpdatePersona);
+            statementUpdatePersona.setString(1, nuevoNombre);
+            statementUpdatePersona.setString(2, nuevoCorreo);
+            statementUpdatePersona.setString(3, nuevoContacto);
+            statementUpdatePersona.setString(4, identidad);
 
-            int filasActualizadas = statement.executeUpdate();
+            int filasActualizadasPersona = statementUpdatePersona.executeUpdate();
 
-            if (filasActualizadas > 0) {
-                JOptionPane.showMessageDialog(this, "Datos de personal actualizados correctamente");
-                txtID1.setText("");
-                mostrarTablaPersonal();
+            if (filasActualizadasPersona > 0) {
+                // Ahora actualizar salario y idpuestopersonal en la tabla personal
+                int nuevoSalario = Integer.parseInt(txtsalarios1.getText()); // Asumiendo que tienes un campo de salario en tu interfaz
+                int nuevoIdPuesto = cbmPuesto.getSelectedIndex() + 1; // Asumiendo que los índices de puestos comienzan en 1
+
+                String consultaUpdatePersonal = "UPDATE personal SET salario = ?, idpuestopersonal = ? WHERE idpersonal = ?";
+                PreparedStatement statementUpdatePersonal = conexion.prepareStatement(consultaUpdatePersonal);
+                statementUpdatePersonal.setInt(1, nuevoSalario);
+                statementUpdatePersonal.setInt(2, nuevoIdPuesto);
+                statementUpdatePersonal.setString(3, identidad);
+
+                int filasActualizadasPersonal = statementUpdatePersonal.executeUpdate();
+
+                if (filasActualizadasPersonal > 0) {
+                    JOptionPane.showMessageDialog(this, "Datos de personal actualizados correctamente");
+                    limpiarCampos();
+                    mostrarTablaPersonal();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró ningún personal con la identidad proporcionada");
+                }
+
+                statementUpdatePersonal.close();
             } else {
-                JOptionPane.showMessageDialog(this, "No se encontró ningún personal con la identidad proporcionada");
+                JOptionPane.showMessageDialog(this, "No se encontró ningún persona con la identidad proporcionada");
             }
 
-            statement.close();
+            statementUpdatePersona.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error al actualizar datos de personal: " + ex.getMessage());
         }
-    
+    } else {
+        JOptionPane.showMessageDialog(this, "Seleccione un tipo de persona válido para actualizar");
     }
-    
 }
 
 
-public void deleteperson(){
-    String identidad  = txtID1.getText();
-    try{
-        String consultaDelete = "DELETE FROM persona WHERE idpersona = ?";
-        PreparedStatement statement = conexion.prepareStatement(consultaDelete);
-        statement.setString(1, identidad);
-        
-        int filasEliminadas = statement.executeUpdate();
+private void deleteCliente() {
+    String identidad = txtID1.getText().trim();
+
+    try {
+        String consultaDelete = "DELETE FROM cliente WHERE idcliente = ?";
+        PreparedStatement statementDelete = conexion.prepareStatement(consultaDelete);
+        statementDelete.setString(1, identidad);
+
+        int filasEliminadas = statementDelete.executeUpdate();
 
         if (filasEliminadas > 0) {
-            txtID1.setText("");
-            txtnombre1.setText("");
-            txtcorreo1.setText("");
-            txtcontacto1.setText("");
+            JOptionPane.showMessageDialog(this, "Cliente eliminado correctamente");
+            limpiarCampos();
+            mostrarTablaCliente();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ningún cliente con la identidad proporcionada");
         }
-       statement.close();
+
+        statementDelete.close();
     } catch (SQLException ex) {
         ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error al eliminar persona: " + ex.getMessage());
+        JOptionPane.showMessageDialog(this, "Error al eliminar cliente: " + ex.getMessage());
     }
 }
-public void eliminarPersonal(){
-    String identidad = txtID1.getText();
-    
-    if(cbmPersona.getSelectedIndex() == 0){
-        try{
-            String consultaDelete = "DELETE FROM cliente Where idcliente = ?";
-            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
-            statement.setString(1, identidad);
-            
-            int filasEliminadas = statement.executeUpdate();
-            
-             if (filasEliminadas > 0) {
-                deleteperson();
-                JOptionPane.showMessageDialog(this, "Cliente eliminada correctamente");
-                txtID1.setText("");
-                txtdireccion1.setText("");
-                mostrarTablaCliente();
-        }else {
-                 JOptionPane.showMessageDialog(this, "No se encontró ninguna cliente con el la identidad proporcionada"); 
-             }
-               statement.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al eliminar cliente: " + ex.getMessage());
+
+// Método para eliminar un registro de personal
+private void deletePersonal() {
+    String identidad = txtID1.getText().trim();
+
+    try {
+        String consultaDelete = "DELETE FROM personal WHERE idpersonal = ?";
+        PreparedStatement statementDelete = conexion.prepareStatement(consultaDelete);
+        statementDelete.setString(1, identidad);
+
+        int filasEliminadas = statementDelete.executeUpdate();
+
+        if (filasEliminadas > 0) {
+            JOptionPane.showMessageDialog(this, "Personal eliminado correctamente");
+            limpiarCampos();
+            mostrarTablaPersonal();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ningún personal con la identidad proporcionada");
         }
-    } else if (cbmPersona.getSelectedIndex() == 1){
-              try{
-            String consultaDelete = "DELETE FROM personal Where idpersonal = ?";
-            PreparedStatement statement = conexion.prepareStatement(consultaDelete);
-            statement.setString(1, identidad);
-            
-            int filasEliminadas = statement.executeUpdate();
-            
-             if (filasEliminadas > 0) {
-                deleteperson();
-                JOptionPane.showMessageDialog(this, "Personal eliminada correctamente");
-                txtID1.setText("");
-                txtsalarios1.setText("");
-                cbmPuesto.setSelectedIndex(-1);
-                mostrarTablaPersonal();
-        }else {
-                 JOptionPane.showMessageDialog(this, "No se encontró ninguna personal con el la identidad proporcionada"); 
-             }
-               statement.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al eliminar personal: " + ex.getMessage());
-        }  
+
+        statementDelete.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al eliminar personal: " + ex.getMessage());
     }
 }
-
-
-
-    
-
-         
-
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -647,8 +642,6 @@ public void eliminarPersonal(){
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("Persona");
 
-        cbmPuesto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Barista", "Camarero/a", "Cajero/a", "Cocinero/a", "Auxiliar de limpieza", "Gerente de Cafetería", "Repostero/a", "Barista especializado/a", "Encargado/a de compras", "Encargado/a de marketing", "Encargado/a de recursos humanos", "Encargado/a de eventos", "Barista supervisor/a", "Recepcionista" }));
-
         btnBuscar.setText("Buscar");
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -695,10 +688,9 @@ public void eliminarPersonal(){
                                 .addGap(91, 91, 91)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(btndelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(JBmodificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(JBmodificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -841,7 +833,7 @@ public void eliminarPersonal(){
     }//GEN-LAST:event_txtdireccion1ActionPerformed
 
     private void btndeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btndeleteActionPerformed
-        eliminarPersonal();
+        deletePersonal();
     }//GEN-LAST:event_btndeleteActionPerformed
 
     /**

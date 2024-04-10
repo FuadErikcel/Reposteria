@@ -21,11 +21,11 @@ public class ConsultaPersonal extends javax.swing.JFrame {
      * Creates new form ConsultaPersonal
      */
     public ConsultaPersonal() {
-        initComponents();
+        initComponents();  
     }
-    
     Conexion conexionObjeto = new Conexion();
-    Connection conexion = conexionObjeto.getConexion();
+    Connection Conexion = conexionObjeto.getConexion();
+    
     
 private void buscarPersonal() {
     String identidadABuscar = JTIdentidad.getText();
@@ -34,11 +34,19 @@ private void buscarPersonal() {
         DefaultTableModel modelo = (DefaultTableModel) JtConsulta.getModel();
         modelo.setRowCount(0);
 
-        String query = "SELECT persona.idpersona, persona.nombre, persona.correo, persona.contacto, personal.salario, personal.puesto " +
-                       "FROM persona INNER JOIN personal ON persona.idpersona = personal.idpersonal " +
-                       "WHERE persona.idpersona ILIKE ?";
-        PreparedStatement pst = conexion.prepareStatement(query);
+String query = "SELECT persona.idpersona, persona.nombre, persona.correo, persona.contacto, personal.salario, puesto.n_puesto " +
+               "FROM persona " +
+               "INNER JOIN personal ON persona.idpersona = personal.idpersonal " +
+               "LEFT JOIN puesto ON personal.idpuestopersonal = puesto.idpuestopersonal " +
+               "WHERE persona.idpersona::TEXT ILIKE ? OR persona.nombre ILIKE ? OR persona.correo ILIKE ? OR persona.contacto ILIKE ? OR puesto.n_puesto ILIKE ? OR personal.salario::TEXT ILIKE ?";
+
+        PreparedStatement pst = Conexion.prepareStatement(query);
         pst.setString(1, "%" + identidadABuscar + "%");
+        pst.setString(2, "%" + identidadABuscar + "%");
+        pst.setString(3, "%" + identidadABuscar + "%");
+        pst.setString(4, "%" + identidadABuscar + "%");
+        pst.setString(5, "%" + identidadABuscar + "%");
+        pst.setString(6, "%" + identidadABuscar + "%");
 
         ResultSet rs = pst.executeQuery();
 
@@ -48,24 +56,16 @@ private void buscarPersonal() {
             String correo = rs.getString("correo");
             String contacto = rs.getString("contacto");
             String salario = rs.getString("salario");
-            String puesto = rs.getString("puesto");
+            String puesto = rs.getString("n_puesto"); // Se obtiene el nombre del puesto desde la tabla puesto
 
             modelo.addRow(new Object[]{idPersona, nombre, correo, contacto, salario, puesto});
         }
 
     } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al ejecutar la consulta: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "Error al ejecutar la consulta: " + e.getMessage()); 
         e.printStackTrace();
     }
 }
-
-
-
-
-   
-  
-
-  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -93,7 +93,7 @@ private void buscarPersonal() {
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Identidad:");
+        jLabel2.setText("Busqueda");
 
         JTIdentidad.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -130,7 +130,7 @@ private void buscarPersonal() {
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(JTIdentidad, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 232, Short.MAX_VALUE))
+                        .addGap(0, 229, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
