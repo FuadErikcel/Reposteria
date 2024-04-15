@@ -120,10 +120,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" max="32767" attributes="0"/>
-          </Group>
+          <Component id="jPanel1" alignment="1" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -179,30 +176,32 @@
                                           <Group type="103" groupAlignment="0" attributes="0">
                                               <Component id="lbdireccion" alignment="0" min="-2" pref="65" max="-2" attributes="0"/>
                                               <Component id="lbpuesto" alignment="0" min="-2" pref="56" max="-2" attributes="0"/>
+                                              <Component id="lbPassword" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                       <Component id="lbsalario" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="txtsalarios1" alignment="0" min="-2" pref="336" max="-2" attributes="0"/>
-                                      <Component id="txtdireccion1" alignment="0" min="-2" pref="336" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="txtsalarios1" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtdireccion1" alignment="0" max="32767" attributes="0"/>
                                       <Component id="cbmPersona" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="cbmPuesto" max="32767" attributes="0"/>
+                                      <Component id="cbmPuesto" alignment="0" pref="336" max="32767" attributes="0"/>
+                                      <Component id="txtPassword" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="81" max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" min="-2" pref="570" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="305" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" pref="85" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="78" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" min="-2" pref="570" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace pref="72" max="32767" attributes="0"/>
+                  <EmptySpace pref="81" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -262,9 +261,14 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lbPassword" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtPassword" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="14" max="32767" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="308" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -465,6 +469,19 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btndeleteActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lbPassword">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Arial" size="14" style="0"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="33" green="33" red="33" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Contrase&#xf1;a:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtPassword">
         </Component>
       </SubComponents>
     </Container>
