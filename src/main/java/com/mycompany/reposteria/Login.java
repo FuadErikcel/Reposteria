@@ -7,6 +7,8 @@ package com.mycompany.reposteria;
  *
  * @author Fuad Erikcel
  */
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,10 +17,8 @@ import javax.swing.JOptionPane;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class Login extends javax.swing.JFrame {
-
-    /**
-     * Creates new form Login
-     */
+    public static int tipoUser = 0;
+  
     public Login() {
         initComponents();
     }
@@ -58,6 +58,11 @@ public class Login extends javax.swing.JFrame {
         txtUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtUserActionPerformed(evt);
+            }
+        });
+        txtUser.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtUserKeyTyped(evt);
             }
         });
         jPanel1.add(txtUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 250, 220, -1));
@@ -102,8 +107,8 @@ public class Login extends javax.swing.JFrame {
         String hashedPassword;
                 
         try {  
-            String consultaSQL = "SELECT idpersonal, password" +
-                                 " FROM personal WHERE idpersonal = ? ";
+            String consultaSQL = "SELECT idusuario, password, tipoUsuario" +
+                                 " FROM usuarios WHERE idusuario = ? ";
             
             PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
@@ -113,9 +118,9 @@ public class Login extends javax.swing.JFrame {
             ResultSet resultSet = statement.executeQuery();
             
             if (resultSet.next()) {              
-                user1 = resultSet.getString("idpersonal");
+                user1 = resultSet.getString("idusuario");
                 hashedPassword = resultSet.getString("password");
-                        
+                tipoUser = resultSet.getInt("tipoUsuario");                        
                  if (BCrypt.checkpw(passwordText, hashedPassword) && user.equals(user1)) {
                         JOptionPane.showMessageDialog(this, "Inicio de Sesión Exitoso");
                         MenuPrincipal menu = new MenuPrincipal();
@@ -133,12 +138,37 @@ public class Login extends javax.swing.JFrame {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
         }
-        
-        
-
-
-        
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    
+    
+    
+    private void txtUserKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUserKeyTyped
+               txtUser.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+              
+                    if (!Character.isDigit(c)) {
+                    e.consume(); // Consume the event, preventing non-numeric input
+                }
+                String id = txtUser.getText();
+                if(id.length()>=13){
+                    e.consume();
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // Not needed for this example
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // Not needed for this example
+            }
+        });
+    }//GEN-LAST:event_txtUserKeyTyped
 
     /**
      * @param args the command line arguments

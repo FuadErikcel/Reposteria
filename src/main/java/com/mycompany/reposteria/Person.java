@@ -6,6 +6,8 @@ import com.mycompany.reposteria.Conexion;
 //import com.mycompany.reposteriac.Conexion;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -83,8 +85,6 @@ public void visible() {
         lbsalario.setVisible(false);
         cbmPuesto.setVisible(false);
         lbpuesto.setVisible(false);
-        lbPassword.setVisible(false);
-        txtPassword.setVisible(false);
     } else if (index == 1) { // Si se selecciona la segunda opción
         // Mostrar los componentes relevantes y ocultar los demás
         txtID1.setVisible(true);
@@ -101,8 +101,7 @@ public void visible() {
         lbsalario.setVisible(true);
         cbmPuesto.setVisible(true);
         lbpuesto.setVisible(true);
-        lbPassword.setVisible(true);
-        txtPassword.setVisible(true);
+
     }
 }
 
@@ -146,8 +145,7 @@ public void insertDates() {
             String identidad = txtID1.getText().trim();
             String salarioString = txtsalarios1.getText().trim();
             String nombrePuesto = cbmPuesto.getSelectedItem().toString().trim(); // Obtener el nombre del puesto seleccionado
-            String password = txtPassword.getText();
-            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
 
             if (identidad.isEmpty() || salarioString.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.");
@@ -177,12 +175,12 @@ public void insertDates() {
                     System.out.println("idpuestopersonal encontrado: " + idPuesto);
 
                     // Ahora que tenemos el idPuesto, procedemos a insertar los datos en la tabla personal
-                    String consultaInsert = "INSERT INTO personal(idpersonal, salario, idpuestopersonal, password) VALUES (?, ?, ?, ?)";
+                    String consultaInsert = "INSERT INTO personal(idpersonal, salario, idpuestopersonal) VALUES (?, ?, ?)";
                     try (PreparedStatement statementInsert = conexion.prepareStatement(consultaInsert)) {
                         statementInsert.setString(1, identidad);
                         statementInsert.setInt(2, salario);
                         statementInsert.setInt(3, idPuesto); // Asignar el ID del puesto como un entero
-                        statementInsert.setString(4, hashedPassword);
+                        //statementInsert.setString(4, hashedPassword);
 
 
                         int filasInsertadas = statementInsert.executeUpdate();
@@ -517,8 +515,6 @@ private void deletePersonal() {
         btnBuscar = new javax.swing.JButton();
         JBmodificar = new javax.swing.JButton();
         btndelete = new javax.swing.JButton();
-        lbPassword = new javax.swing.JLabel();
-        txtPassword = new javax.swing.JTextField();
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 51, 51));
@@ -566,6 +562,11 @@ private void deletePersonal() {
         txtID1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtID1ActionPerformed(evt);
+            }
+        });
+        txtID1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtID1KeyTyped(evt);
             }
         });
 
@@ -669,10 +670,6 @@ private void deletePersonal() {
             }
         });
 
-        lbPassword.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lbPassword.setForeground(new java.awt.Color(51, 51, 51));
-        lbPassword.setText("Contraseña:");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -707,16 +704,14 @@ private void deletePersonal() {
                                         .addGap(3, 3, 3)
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(lbdireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lbpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lbPassword)))
+                                            .addComponent(lbpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                     .addComponent(lbsalario))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(25, 25, 25)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtsalarios1)
                                     .addComponent(txtdireccion1)
                                     .addComponent(cbmPersona, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(cbmPuesto, 0, 336, Short.MAX_VALUE)
-                                    .addComponent(txtPassword)))))
+                                    .addComponent(cbmPuesto, 0, 336, Short.MAX_VALUE)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(305, 305, 305)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -770,11 +765,7 @@ private void deletePersonal() {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cbmPuesto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbPassword)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24))
         );
@@ -850,6 +841,33 @@ private void deletePersonal() {
         deletePersonal();
     }//GEN-LAST:event_btndeleteActionPerformed
 
+    private void txtID1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtID1KeyTyped
+                      txtID1.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+              
+                    if (!Character.isDigit(c)) {
+                    e.consume(); // Consume the event, preventing non-numeric input
+                }
+                String id = txtID1.getText();
+                if(id.length()>=13){
+                    e.consume();
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // Not needed for this example
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // Not needed for this example
+            }
+        });
+    }//GEN-LAST:event_txtID1KeyTyped
+
     /**
      * @param args the command line arguments
      */
@@ -905,7 +923,6 @@ private void deletePersonal() {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbIdentidad;
     private javax.swing.JLabel lbNombre;
-    private javax.swing.JLabel lbPassword;
     private javax.swing.JLabel lbcontacto;
     private javax.swing.JLabel lbcorreo;
     private javax.swing.JLabel lbdireccion;
@@ -913,7 +930,6 @@ private void deletePersonal() {
     private javax.swing.JLabel lbsalario;
     private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtID1;
-    private javax.swing.JTextField txtPassword;
     private javax.swing.JTextField txtcontacto;
     private javax.swing.JTextField txtcontacto1;
     private javax.swing.JTextField txtcorreo;
