@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class Login extends javax.swing.JFrame {
-    public static int tipoUser = 0;
+    public static int tipoUser = -1;
   
     public Login() {
         initComponents();

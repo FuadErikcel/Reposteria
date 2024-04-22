@@ -8,8 +8,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.export.SimplePdfReportConfiguration;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -617,6 +629,7 @@ public void deleteProduct() {
         jButton1 = new javax.swing.JButton();
         txtVencimiento = new com.toedter.calendar.JDateChooser();
         jButton2 = new javax.swing.JButton();
+        btnR = new javax.swing.JButton();
 
         jLabel1.setText("jLabel1");
 
@@ -680,7 +693,7 @@ public void deleteProduct() {
                 btnGuardarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 100, 90, -1));
+        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 100, 120, -1));
 
         jLabel4.setText("Fecha de Elaboración:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 140, -1, -1));
@@ -750,7 +763,7 @@ public void deleteProduct() {
                 btnBuscarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(499, 140, 90, -1));
+        jPanel1.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(499, 140, 120, -1));
         jPanel1.add(txtFechaSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 200, -1));
 
         jButton1.setText("Eliminar");
@@ -759,7 +772,7 @@ public void deleteProduct() {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 180, 90, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 180, 120, -1));
         jPanel1.add(txtVencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 200, -1));
 
         jButton2.setText("Modificar");
@@ -768,7 +781,15 @@ public void deleteProduct() {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 220, 90, -1));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 220, 120, -1));
+
+        btnR.setText("Generar Reporte");
+        btnR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnR, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 260, -1, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 600));
 
@@ -819,6 +840,91 @@ public void deleteProduct() {
         updateData();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void btnRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRActionPerformed
+      if(cbxProducto.getSelectedIndex()==0){
+             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jrxml";
+             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jasper";
+        
+            try {
+                JasperCompileManager.compileReportToFile(jrxmlFilePath);
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      
+            try {
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                 JasperViewer.viewReport(jasperPrint, false);
+
+                  JRPdfExporter exporter = new JRPdfExporter();
+                  exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                  exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                  SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                  SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                  exporter.setConfiguration(reportConfig);
+                  exporter.setConfiguration(exportConfig);
+
+
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      }else if(cbxProducto.getSelectedIndex()==1){
+             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Pan.jrxml";
+             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Pan.jasper";
+        
+            try {
+                JasperCompileManager.compileReportToFile(jrxmlFilePath);
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      
+            try {
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                 JasperViewer.viewReport(jasperPrint, false);
+
+                  JRPdfExporter exporter = new JRPdfExporter();
+                  exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                  exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                  SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                  SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                  exporter.setConfiguration(reportConfig);
+                  exporter.setConfiguration(exportConfig);
+
+
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+      }else if(cbxProducto.getSelectedIndex()==2){
+             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\PastelNormal.jrxml";
+             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\PastelNormal.jasper";
+        
+            try {
+                JasperCompileManager.compileReportToFile(jrxmlFilePath);
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      
+            try {
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                 JasperViewer.viewReport(jasperPrint, false);
+
+                  JRPdfExporter exporter = new JRPdfExporter();
+                  exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                  exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                  SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                  SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                  exporter.setConfiguration(reportConfig);
+                  exporter.setConfiguration(exportConfig);
+
+
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      }
+    }//GEN-LAST:event_btnRActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -857,6 +963,7 @@ public void deleteProduct() {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnR;
     private javax.swing.JComboBox<String> cbxPastelNormal;
     private javax.swing.JComboBox<String> cbxProducto;
     private javax.swing.JComboBox<String> cbxTipoGalleta;

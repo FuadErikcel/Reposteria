@@ -86,10 +86,11 @@
         <Component class="javax.swing.JComboBox" name="cbxTipoUsuario">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="3">
+              <StringArray count="4">
                 <StringItem index="0" value="Administrador General"/>
                 <StringItem index="1" value="Administrador de Ventas"/>
                 <StringItem index="2" value="Personal de Cocina"/>
+                <StringItem index="3" value="Personal de Caja / Venta"/>
               </StringArray>
             </Property>
           </Properties>

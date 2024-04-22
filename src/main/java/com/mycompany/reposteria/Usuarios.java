@@ -53,7 +53,7 @@ public class Usuarios extends javax.swing.JFrame {
         jLabel3.setText("Tipo de Usuario:");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, -1, -1));
 
-        cbxTipoUsuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrador General", "Administrador de Ventas", "Personal de Cocina" }));
+        cbxTipoUsuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrador General", "Administrador de Ventas", "Personal de Cocina", "Personal de Caja / Venta" }));
         jPanel1.add(cbxTipoUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 170, -1, -1));
 
         btnAgregarUser.setText("Agregar");
@@ -132,6 +132,7 @@ public class Usuarios extends javax.swing.JFrame {
                                                 "        WHEN tipoUsuario = 0 THEN 'Administrador General'\n" +
                                                 "        WHEN tipoUsuario = 1 THEN 'Administrador de Ventas'\n" +
                                                 "		WHEN tipoUsuario = 2 THEN 'Personal de Cocina'\n" +
+                                                "                        WHEN tipoUsuario = 3 THEN 'Personal de Caja / Venta'\n" +
                                                 "    END AS tipoUsuario\n" +
                                                 "FROM usuarios\n" +
                                                 "JOIN persona ON persona.idpersona = usuarios.idusuario";

@@ -8,8 +8,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.export.SimplePdfReportConfiguration;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -43,7 +55,8 @@ public class Consultas extends javax.swing.JFrame {
         btnBuscar = new javax.swing.JButton();
         dateFecha2 = new com.toedter.calendar.JDateChooser();
         lbFecha2 = new javax.swing.JLabel();
-        txtProveedor = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        btnC = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -51,18 +64,18 @@ public class Consultas extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbFiltro.setText("Filtro:");
-        jPanel1.add(lbFiltro, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, -1, -1));
+        jPanel1.add(lbFiltro, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, -1));
 
-        cbxFiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Búsqueda por Fecha Elaboración", "Búsqueda Rango de Fechas", "Últimos 30 días", "Ordenar por Fecha", "Próximos a Entregar", "Próximos a Vencer", "Búsqueda de Proveedor" }));
+        cbxFiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Búsqueda por Fecha Elaboración", "Búsqueda Rango de Fechas", "Últimos 30 días", "Ordenar por Fecha", "Próximos a Entregar" }));
         cbxFiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxFiltroActionPerformed(evt);
             }
         });
-        jPanel1.add(cbxFiltro, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 60, 250, -1));
+        jPanel1.add(cbxFiltro, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 120, 250, -1));
 
         lbFecha.setText("Fecha:");
-        jPanel1.add(lbFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, -1, -1));
+        jPanel1.add(lbFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, -1, -1));
 
         dateFecha.addAncestorListener(new javax.swing.event.AncestorListener() {
             public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
@@ -78,7 +91,7 @@ public class Consultas extends javax.swing.JFrame {
                 dateFechaFocusLost(evt);
             }
         });
-        jPanel1.add(dateFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, 200, -1));
+        jPanel1.add(dateFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, 200, -1));
 
         tablaFechas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -93,7 +106,7 @@ public class Consultas extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tablaFechas);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 300, 720, 220));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 290, 720, 220));
 
         btnBuscar.setText("Buscar");
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -101,36 +114,27 @@ public class Consultas extends javax.swing.JFrame {
                 btnBuscarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 30, -1, -1));
-        jPanel1.add(dateFecha2, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 110, 220, -1));
+        jPanel1.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 90, 120, -1));
+        jPanel1.add(dateFecha2, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 170, 220, -1));
 
         lbFecha2.setText("Fecha 2:");
-        jPanel1.add(lbFecha2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 110, -1, -1));
+        jPanel1.add(lbFecha2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 170, -1, -1));
 
-        txtProveedor.addActionListener(new java.awt.event.ActionListener() {
+        jLabel1.setText("Consultas Productos");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 20, -1, -1));
+
+        btnC.setText("Generar Informe");
+        btnC.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtProveedorActionPerformed(evt);
+                btnCActionPerformed(evt);
             }
         });
-        txtProveedor.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtProveedorKeyTyped(evt);
-            }
-        });
-        jPanel1.add(txtProveedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 180, -1));
+        jPanel1.add(btnC, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 120, -1, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 720, 520));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 930, 520));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtProveedorKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtProveedorKeyTyped
-        buscarProveedor();
-    }//GEN-LAST:event_txtProveedorKeyTyped
-
-    private void txtProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProveedorActionPerformed
-        // buscarProveedor();
-    }//GEN-LAST:event_txtProveedorActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 
@@ -154,9 +158,9 @@ public class Consultas extends javax.swing.JFrame {
             btnBuscar.setVisible(true);
             lbFecha2.setVisible(false);
             dateFecha2.setVisible(false);
-            txtProveedor.setVisible(false);
             lbFecha.setVisible(true);
             dateFecha.setVisible(true);
+            btnC.setVisible(false);
         }else if(cbxFiltro.getSelectedIndex()==2){
             btnBuscar.setVisible(false);
             last30days();
@@ -172,24 +176,101 @@ public class Consultas extends javax.swing.JFrame {
             lbFecha2.setVisible(false);
             dateFecha2.setVisible(false);
             btnBuscar.setVisible(false);
-            txtProveedor.setVisible(true);
         }else if (cbxFiltro.getSelectedIndex()==1){
             lbFecha.setVisible(true);
             dateFecha.setVisible(true);
             lbFecha2.setVisible(true);
             dateFecha2.setVisible(true);
             btnBuscar.setVisible(true);
-            txtProveedor.setVisible(false);
-        }else if(cbxFiltro.getSelectedIndex()==5){
-            lbFecha.setVisible(false);
-            dateFecha.setVisible(false);
-            lbFecha2.setVisible(false);
-            dateFecha2.setVisible(false);
-            btnBuscar.setVisible(false);
-            txtProveedor.setVisible(false);
-            fechaVencimiento();
+            btnC.setVisible(false);
         }
     }//GEN-LAST:event_cbxFiltroActionPerformed
+
+    private void btnCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCActionPerformed
+   
+       if(cbxFiltro.getSelectedIndex()==2){
+                    String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\last30.jrxml";
+                    String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\last30.jasper";
+
+                   try {
+                       JasperCompileManager.compileReportToFile(jrxmlFilePath);
+                   } catch (JRException ex) {
+                       Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+
+                   try {
+                       JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                        JasperViewer.viewReport(jasperPrint, false);
+
+                         JRPdfExporter exporter = new JRPdfExporter();
+                         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                         exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                         SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                         SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                         exporter.setConfiguration(reportConfig);
+                         exporter.setConfiguration(exportConfig);
+
+
+                   } catch (JRException ex) {
+                       Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+        }else if(cbxFiltro.getSelectedIndex()==3){
+                    String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\ordenarFecha.jrxml";
+                    String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\ordenarFecha.jasper";
+
+                   try {
+                       JasperCompileManager.compileReportToFile(jrxmlFilePath);
+                   } catch (JRException ex) {
+                       Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+
+                   try {
+                       JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                        JasperViewer.viewReport(jasperPrint, false);
+
+                         JRPdfExporter exporter = new JRPdfExporter();
+                         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                         exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                         SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                         SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                         exporter.setConfiguration(reportConfig);
+                         exporter.setConfiguration(exportConfig);
+
+
+                   } catch (JRException ex) {
+                       Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+                   }            
+        }else if(cbxFiltro.getSelectedIndex()==4){
+                    String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\proximosEntrega.jrxml";
+                    String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\proximosEntrega.jasper";
+
+                   try {
+                       JasperCompileManager.compileReportToFile(jrxmlFilePath);
+                   } catch (JRException ex) {
+                       Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+
+                   try {
+                       JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                        JasperViewer.viewReport(jasperPrint, false);
+
+                         JRPdfExporter exporter = new JRPdfExporter();
+                         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                         exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                         SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                         SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                         exporter.setConfiguration(reportConfig);
+                         exporter.setConfiguration(exportConfig);
+
+
+                   } catch (JRException ex) {
+                       Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+                   }            
+        }
+    }//GEN-LAST:event_btnCActionPerformed
 
     /**
      * @param args the command line arguments
@@ -487,108 +568,22 @@ public class Consultas extends javax.swing.JFrame {
         }
     }
     
-    public void buscarProveedor(){
-        String proveedor = txtProveedor.getText();
-         
-        try{
-            String consultaSQL = "SELECT idproveedor, nombre, contacto, detalles FROM proveedores WHERE nombre ILIKE ?" ;
-            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
-            statement.setString(1, "%"+proveedor+"%");
 
-            ResultSet resultSet = statement.executeQuery();
-            
-            DefaultTableModel modeloTabla = new DefaultTableModel();
-            modeloTabla.addColumn("ID");
-            modeloTabla.addColumn("Nombre");
-            modeloTabla.addColumn("Contacto");
-            modeloTabla.addColumn("Detalles");
-
-            
-            while (resultSet.next()) {
-                Object[] fila = {
-                        resultSet.getString("idproveedor"),
-                        resultSet.getString("nombre"),
-                        resultSet.getString("contacto"),
-                        resultSet.getString("detalles")
-
-                };
-                modeloTabla.addRow(fila);
-            }
-
-            tablaFechas.setModel(modeloTabla);
-
-            statement.close();
-            
-        }catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
-        }
-    }
     
-    public void fechaVencimiento(){
-        try{
-            String consultaSQL = "SELECT \n" +
-                                                "    idpan AS idproducto,\n" +
-                                                "    tipo,\n" +
-                                                "    fechavencimiento AS vencimiento,\n" +
-                                                "    CASE \n" +
-                                                "        WHEN fechavencimiento < CURRENT_DATE THEN 'Producto Vencido'\n" +
-                                                "        ELSE (fechavencimiento - CURRENT_DATE) || ' Días Restantes'\n" +
-                                                "    END AS estado\n" +
-                                                "FROM \n" +
-                                                "    pan\n" +
-                                                "UNION ALL\n" +
-                                                "SELECT \n" +
-                                                "    idgalletas AS idproducto,\n" +
-                                                "    tipo,\n" +
-                                                "    fechavencimiento AS vencimiento,\n" +
-                                                "    CASE \n" +
-                                                "        WHEN fechavencimiento < CURRENT_DATE THEN 'Producto Vencido'\n" +
-                                                "        ELSE (fechavencimiento - CURRENT_DATE) || ' Días Restantes'\n" +
-                                                "    END AS estado\n" +
-                                                "FROM \n" +
-                                                "    galletas;";
-            PreparedStatement statement = conexion.prepareStatement(consultaSQL);
 
-            ResultSet resultSet = statement.executeQuery();
-            
-            DefaultTableModel modeloTabla = new DefaultTableModel();
-            modeloTabla.addColumn("ID");
-            modeloTabla.addColumn("Tipo");
-            modeloTabla.addColumn("Fecha de Vencimiento");
-            modeloTabla.addColumn("Estado");
-
-            
-            while (resultSet.next()) {
-                Object[] fila = {
-                        resultSet.getString("idproducto"),
-                        resultSet.getString("tipo"),
-                        resultSet.getString("vencimiento"),
-                        resultSet.getString("estado")
-
-                };
-                modeloTabla.addRow(fila);
-            }
-
-            tablaFechas.setModel(modeloTabla);
-
-            statement.close();
-            
-        }catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al ejecutar consulta: " + ex.getMessage());
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnC;
     private javax.swing.JComboBox<String> cbxFiltro;
     private com.toedter.calendar.JDateChooser dateFecha;
     private com.toedter.calendar.JDateChooser dateFecha2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbFecha;
     private javax.swing.JLabel lbFecha2;
     private javax.swing.JLabel lbFiltro;
     private javax.swing.JTable tablaFechas;
-    private javax.swing.JTextField txtProveedor;
     // End of variables declaration//GEN-END:variables
 }

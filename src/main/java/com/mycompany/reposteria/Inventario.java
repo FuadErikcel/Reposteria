@@ -12,6 +12,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.export.SimplePdfReportConfiguration;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -245,6 +255,7 @@ public class Inventario extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaInventario = new javax.swing.JTable();
         FechaVencimientoText = new com.toedter.calendar.JDateChooser();
+        jButton5 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -291,7 +302,7 @@ public class Inventario extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 91, -1, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 91, 120, -1));
 
         jButton2.setText("Buscar");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -299,7 +310,7 @@ public class Inventario extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 132, -1, -1));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 132, 120, -1));
 
         jButton3.setText("Modificar");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -307,7 +318,7 @@ public class Inventario extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 173, -1, -1));
+        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 173, 120, -1));
 
         jButton4.setText("Eliminar");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -315,7 +326,7 @@ public class Inventario extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 214, -1, -1));
+        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(481, 214, 120, -1));
 
         tablaInventario.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -331,7 +342,15 @@ public class Inventario extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tablaInventario);
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 320, 610, 310));
-        jPanel1.add(FechaVencimientoText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 250, 130, -1));
+        jPanel1.add(FechaVencimientoText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 250, 120, -1));
+
+        jButton5.setText("Generar Informe");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 250, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -374,6 +393,38 @@ public class Inventario extends javax.swing.JFrame {
             Logger.getLogger(Inventario.class.getName()).log(Level.SEVERE, null, ex);
         }  
     }//GEN-LAST:event_IdIngredienteTextFocusLost
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+//        String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jrxml";
+//        String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jasper";
+
+        String jrxmlFilePath  = "./Galletas.jrxml";
+        String jasperFilePath = "./Galletas.jasper";
+        
+            try {
+                JasperCompileManager.compileReportToFile(jrxmlFilePath);
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      
+            try {
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                 JasperViewer.viewReport(jasperPrint, false);
+
+                  JRPdfExporter exporter = new JRPdfExporter();
+                  exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                  exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                  SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                  SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                  exporter.setConfiguration(reportConfig);
+                  exporter.setConfiguration(exportConfig);
+
+
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -426,6 +477,7 @@ public class Inventario extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;

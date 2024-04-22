@@ -8,8 +8,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.export.SimplePdfReportConfiguration;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -23,6 +35,7 @@ public class ConsultaPersonal extends javax.swing.JFrame {
     public ConsultaPersonal() {
         initComponents();  
     }
+    
     Conexion conexionObjeto = new Conexion();
     Connection Conexion = conexionObjeto.getConexion();
     
@@ -82,6 +95,7 @@ String query = "SELECT persona.idpersona, persona.nombre, persona.correo, person
         JTIdentidad = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         JtConsulta = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,12 +128,20 @@ String query = "SELECT persona.idpersona, persona.nombre, persona.correo, person
         ));
         jScrollPane1.setViewportView(JtConsulta);
 
+        jButton1.setText("Generar Informe");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -129,9 +151,10 @@ String query = "SELECT persona.idpersona, persona.nombre, persona.correo, person
                                 .addGap(66, 66, 66)
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(JTIdentidad, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 229, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addComponent(JTIdentidad, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(48, 48, 48)
+                                .addComponent(jButton1)))
+                        .addGap(0, 61, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -142,7 +165,8 @@ String query = "SELECT persona.idpersona, persona.nombre, persona.correo, person
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(JTIdentidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(JTIdentidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -166,6 +190,35 @@ String query = "SELECT persona.idpersona, persona.nombre, persona.correo, person
         // TODO add your handling code here:
         buscarPersonal();
     }//GEN-LAST:event_JTIdentidadKeyReleased
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Reporte.jrxml";
+             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Reporte.jasper";
+        
+            try {
+                JasperCompileManager.compileReportToFile(jrxmlFilePath);
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      
+            try {
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, Conexion);
+                 JasperViewer.viewReport(jasperPrint, false);
+
+                  JRPdfExporter exporter = new JRPdfExporter();
+                  exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                  exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                  SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                  SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                  exporter.setConfiguration(reportConfig);
+                  exporter.setConfiguration(exportConfig);
+
+
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -205,6 +258,7 @@ String query = "SELECT persona.idpersona, persona.nombre, persona.correo, person
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField JTIdentidad;
     private javax.swing.JTable JtConsulta;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;

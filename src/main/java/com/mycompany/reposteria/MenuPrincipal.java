@@ -90,6 +90,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         lbInventario = new javax.swing.JLabel();
         btnConsultas = new javax.swing.JButton();
         lbConsultas = new javax.swing.JLabel();
+        btnUsuarios = new javax.swing.JButton();
+        lbUsuarios = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -97,7 +99,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel1.add(btnFacturas, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 280, 90, 80));
         jPanel1.add(btnInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 150, 90, 80));
 
-        btnPersonal.setIcon(new javax.swing.ImageIcon("C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\src\\main\\java\\com\\mycompany\\reposteria\\icons\\personal.png")); // NOI18N
         btnPersonal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPersonalActionPerformed(evt);
@@ -112,13 +113,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 btnProveedoresActionPerformed(evt);
             }
         });
-        jPanel1.add(btnProveedores, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 400, 100, 80));
+        jPanel1.add(btnProveedores, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 410, 100, 80));
 
         lbPersonal.setText("Personal");
         jPanel1.add(lbPersonal, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 240, -1, -1));
 
-        lbPnormales.setText("Pasteles Sencillos");
-        jPanel1.add(lbPnormales, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 240, -1, -1));
+        lbPnormales.setText("Productos");
+        jPanel1.add(lbPnormales, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 240, -1, -1));
 
         lbPpersonalizados.setText("Pasteles Personalizados");
         jPanel1.add(lbPpersonalizados, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 240, -1, -1));
@@ -134,7 +135,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel1.add(btnConsultas, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 280, 100, 80));
 
         lbConsultas.setText("Consultas");
-        jPanel1.add(lbConsultas, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 490, -1, -1));
+        jPanel1.add(lbConsultas, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 490, -1, -1));
+        jPanel1.add(btnUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 410, 90, 80));
+
+        lbUsuarios.setText("Usuarios");
+        jPanel1.add(lbUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 490, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -156,6 +161,41 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     private void btnProveedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProveedoresActionPerformed
 
+        // Arreglo de opciones
+        Object[] options = {"Productos", "Proveedores", "Clientes", "Personal", "Facturas"};
+
+        // Mostrar el cuadro de diálogo con las opciones
+        int choice = JOptionPane.showOptionDialog(null,
+                "Seleccione el Tipo de Consulta:",
+                "Consultas",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]); // Opción predeterminada (en este caso, la primera opción)
+
+        // Procesar la opción seleccionada
+        if (options[choice].equals("Productos") ) {
+            Consultas consultas = new Consultas();
+            consultas.setVisible(true);
+            this.dispose();
+        } else if(options[choice].equals("Proveedores")) {
+            consultasProveedores cp = new consultasProveedores();
+            cp.setVisible(true);
+            this.dispose();
+        }else if(options[choice].equals("Clientes")){
+            ConsultaCliente cc = new ConsultaCliente();
+            cc.setVisible(true);
+            this.dispose();
+        }else if(options[choice].equals("Personal")){
+            ConsultaPersonal cpp = new ConsultaPersonal();
+            cpp.setVisible(true);
+            this.dispose();
+        }else if(options[choice].equals("Facturas")){
+            ConsultasFactura cf = new ConsultasFactura(); 
+            cf.setVisible(true);
+            this.dispose();
+        }
     }//GEN-LAST:event_btnProveedoresActionPerformed
 
     /**
@@ -201,6 +241,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnPnormales;
     private javax.swing.JButton btnPpersonalizados;
     private javax.swing.JButton btnProveedores;
+    private javax.swing.JButton btnUsuarios;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lbConsultas;
     private javax.swing.JLabel lbFacturas;
@@ -209,5 +250,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel lbPnormales;
     private javax.swing.JLabel lbPpersonalizados;
     private javax.swing.JLabel lbProveedores;
+    private javax.swing.JLabel lbUsuarios;
     // End of variables declaration//GEN-END:variables
 }

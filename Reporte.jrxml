@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4_2" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2efe5e23-8d59-47dc-8727-566b1e5a3c14">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="cGVyc29uYSAsMTUsMTUsYWU1NTZlOTItNzJiMS00NTk3LWFiZDItODRmMmFkYTljZGFiOw=="/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Repost.jrdax"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT *
+FROM persona]]>
+	</queryString>
+	<field name="idpersona" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="idpersona"/>
+		<property name="com.jaspersoft.studio.field.label" value="idpersona"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persona"/>
+	</field>
+	<field name="nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persona"/>
+	</field>
+	<field name="correo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="correo"/>
+		<property name="com.jaspersoft.studio.field.label" value="correo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persona"/>
+	</field>
+	<field name="contacto" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="contacto"/>
+		<property name="com.jaspersoft.studio.field.label" value="contacto"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persona"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="230" y="30" width="100" height="30" uuid="8f7d8592-167d-4e97-a7b9-86e290edd1fb"/>
+				<text><![CDATA[Reportes - Personal]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="80" y="0" width="30" height="22" uuid="645c6d18-b91a-4325-a9e1-9eb28745e8ca"/>
+				<text><![CDATA[ID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="100" height="30" uuid="d4508845-d13d-45a3-82f7-52323f6256f2"/>
+				<text><![CDATA[Nombre]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="100" height="30" uuid="b917ed52-1ce7-4e20-a2bf-d79b8d5ec99e"/>
+				<text><![CDATA[Correo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="0" width="100" height="30" uuid="af703dbd-88e6-48f6-aa2c-5697d5c3d33e"/>
+				<text><![CDATA[Contacto]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField textAdjust="ScaleFont">
+				<reportElement positionType="FixRelativeToBottom" x="80" y="0" width="100" height="20" uuid="b21f63be-6efe-413e-b185-bb035ad0dc6c"/>
+				<textFieldExpression><![CDATA[$F{idpersona}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="100" height="30" uuid="b9619c93-5da3-4071-9d78-123740b7d892"/>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="140" height="30" uuid="0726a0a7-6f4e-49af-8184-49e5c63b1fb7"/>
+				<textFieldExpression><![CDATA[$F{correo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="100" height="30" uuid="9273c6ed-1fd8-4154-8d92-06d4f44ea984"/>
+				<textFieldExpression><![CDATA[$F{contacto}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

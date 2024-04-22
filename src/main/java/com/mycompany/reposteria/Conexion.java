@@ -20,7 +20,7 @@ public class Conexion {
             Class.forName("org.postgresql.Driver");
             String url ="jdbc:postgresql://"+HOST+":"+PUERTO+"/"+DB;
             conexion = DriverManager.getConnection(url, USER, PASSWORD);
-            JOptionPane.showMessageDialog(null, "conexion exitosa");
+           // JOptionPane.showMessageDialog(null, "conexion exitosa");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }

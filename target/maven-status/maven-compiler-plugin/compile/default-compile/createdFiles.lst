@@ -1,4 +1,6 @@
 com\mycompany\reposteria\Inventario.class
+com\mycompany\reposteria\consultasProveedores$3.class
+com\mycompany\reposteria\consultasProveedores.class
 com\mycompany\reposteria\Login$5.class
 com\mycompany\reposteria\Factura$7.class
 com\mycompany\reposteria\Person$2.class
@@ -13,7 +15,9 @@ com\mycompany\reposteria\ConsultaPersonal$2.class
 com\mycompany\reposteria\ConsultasFactura$4.class
 com\mycompany\reposteria\Factura$12.class
 com\mycompany\reposteria\Factura$1.class
+com\mycompany\reposteria\Person$15.class
 com\mycompany\reposteria\ConsultaCliente$1.class
+com\mycompany\reposteria\Inventario$7.class
 com\mycompany\reposteria\ConsultasFactura$7.class
 com\mycompany\reposteria\Productos.class
 com\mycompany\reposteria\Factura$4.class
@@ -25,6 +29,7 @@ com\mycompany\reposteria\MenuPrincipal$2.class
 com\mycompany\reposteria\Inventario$4.class
 com\mycompany\reposteria\ConsultasFactura$5.class
 com\mycompany\reposteria\ConsultaPersonal.class
+com\mycompany\reposteria\Productos$13.class
 com\mycompany\reposteria\PastelesPersonalizados.class
 com\mycompany\reposteria\ConsultaPersonal$1.class
 com\mycompany\reposteria\Factura$13.class
@@ -37,6 +42,7 @@ com\mycompany\reposteria\ConsultaCliente.class
 com\mycompany\reposteria\Consultas$6.class
 com\mycompany\reposteria\Person$1.class
 com\mycompany\reposteria\Person$12.class
+com\mycompany\reposteria\consultasProveedores$2.class
 com\mycompany\reposteria\Factura$8.class
 com\mycompany\reposteria\Usuarios$1.class
 com\mycompany\reposteria\Factura$14.class
@@ -47,6 +53,7 @@ com\mycompany\reposteria\Factura$9.class
 com\mycompany\reposteria\Proveedores$1.class
 com\mycompany\reposteria\PastelesPersonalizados$6.class
 com\mycompany\reposteria\Person$13.class
+com\mycompany\reposteria\Proveedores$8.class
 com\mycompany\reposteria\Reposteria.class
 com\mycompany\reposteria\Inventario$5.class
 com\mycompany\reposteria\Consultas.class
@@ -66,16 +73,19 @@ com\mycompany\reposteria\Usuarios.class
 com\mycompany\reposteria\Consultas$1.class
 com\mycompany\reposteria\Inventario$6.class
 com\mycompany\reposteria\Person$9.class
+com\mycompany\reposteria\ConsultaPersonal$3.class
 com\mycompany\reposteria\Factura.class
 com\mycompany\reposteria\ConsultasFactura$3.class
+com\mycompany\reposteria\ConsultaCliente$3.class
+com\mycompany\reposteria\MenuPrincipal$3.class
 com\mycompany\reposteria\Proveedores$6.class
 com\mycompany\reposteria\Consultas$4.class
 com\mycompany\reposteria\Inventario$3.class
-com\mycompany\reposteria\Consultas$7.class
 com\mycompany\reposteria\Login$3.class
 com\mycompany\reposteria\Productos$12.class
 com\mycompany\reposteria\PastelesPersonalizados$4.class
 com\mycompany\reposteria\PastelesPersonalizados$11.class
+com\mycompany\reposteria\consultasProveedores$1.class
 com\mycompany\reposteria\Productos$4.class
 com\mycompany\reposteria\Productos$7.class
 com\mycompany\reposteria\PastelesPersonalizados$1.class
