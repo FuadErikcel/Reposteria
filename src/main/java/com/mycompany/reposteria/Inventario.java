@@ -395,11 +395,9 @@ public class Inventario extends javax.swing.JFrame {
     }//GEN-LAST:event_IdIngredienteTextFocusLost
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-//        String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jrxml";
-//        String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jasper";
 
-        String jrxmlFilePath  = "./Galletas.jrxml";
-        String jasperFilePath = "./Galletas.jasper";
+        String jrxmlFilePath  = "./inventario.jrxml";
+        String jasperFilePath = "./inventario.jasper";
         
             try {
                 JasperCompileManager.compileReportToFile(jrxmlFilePath);
