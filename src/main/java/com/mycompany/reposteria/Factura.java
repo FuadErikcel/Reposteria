@@ -13,6 +13,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.export.SimplePdfReportConfiguration;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -264,6 +274,8 @@ DefaultTableModel model;
         NombreProductoText.setText("");
         PrecioText.setText("");
         CantidadText.setText("");
+        SubTotalText.setText("");
+        TotalText.setText("");
 
         int fila = model.getRowCount();
         for(int i = fila-1; i>=0; i--){
@@ -473,6 +485,8 @@ DefaultTableModel model;
         TotalText = new javax.swing.JTextField();
         CbxFactura = new javax.swing.JComboBox<>();
         FechaVentaText = new com.toedter.calendar.JDateChooser();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -513,6 +527,12 @@ DefaultTableModel model;
             }
         });
         jPanel1.add(CantidadText, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 310, 130, -1));
+
+        PrecioText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PrecioTextActionPerformed(evt);
+            }
+        });
         jPanel1.add(PrecioText, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 250, 60, -1));
 
         IdClienteLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -650,6 +670,22 @@ DefaultTableModel model;
         jPanel1.add(CbxFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 110, 30));
         jPanel1.add(FechaVentaText, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 100, 140, -1));
 
+        jButton6.setText("Menu Principal");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 270, -1, -1));
+
+        jButton7.setText("Generar Reporte");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 300, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -764,6 +800,45 @@ DefaultTableModel model;
         // TODO add your handling code here:
     }//GEN-LAST:event_IdPersonaTextFocusGained
 
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+               MenuPrincipal mp = new MenuPrincipal();
+        mp.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void PrecioTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrecioTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_PrecioTextActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+                   String jrxmlFilePath  = "factura.jrxml";
+             String jasperFilePath = "factura.jasper";
+        
+            try {
+                JasperCompileManager.compileReportToFile(jrxmlFilePath);
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      
+            try {
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFilePath, null, conexion);
+                 JasperViewer.viewReport(jasperPrint, false);
+
+                  JRPdfExporter exporter = new JRPdfExporter();
+                  exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                  exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("C:\\Users\\Fuad Erikcel\\Escritorio"));
+
+                  SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+                  SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+                  exporter.setConfiguration(reportConfig);
+                  exporter.setConfiguration(exportConfig);
+
+
+            } catch (JRException ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }//GEN-LAST:event_jButton7ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -828,6 +903,8 @@ DefaultTableModel model;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

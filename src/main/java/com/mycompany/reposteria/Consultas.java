@@ -57,6 +57,7 @@ public class Consultas extends javax.swing.JFrame {
         lbFecha2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         btnC = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -131,6 +132,14 @@ public class Consultas extends javax.swing.JFrame {
         });
         jPanel1.add(btnC, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 120, -1, -1));
 
+        jButton1.setText("Menu Principal");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 150, 120, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 930, 520));
 
         pack();
@@ -189,8 +198,8 @@ public class Consultas extends javax.swing.JFrame {
     private void btnCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCActionPerformed
    
        if(cbxFiltro.getSelectedIndex()==2){
-                    String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\last30.jrxml";
-                    String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\last30.jasper";
+                    String jrxmlFilePath  = "last30.jrxml";
+                    String jasperFilePath = "last30.jasper";
 
                    try {
                        JasperCompileManager.compileReportToFile(jrxmlFilePath);
@@ -216,8 +225,8 @@ public class Consultas extends javax.swing.JFrame {
                        Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
                    }
         }else if(cbxFiltro.getSelectedIndex()==3){
-                    String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\ordenarFecha.jrxml";
-                    String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\ordenarFecha.jasper";
+                    String jrxmlFilePath  = "ordenarFecha.jrxml";
+                    String jasperFilePath = "ordenarFecha.jasper";
 
                    try {
                        JasperCompileManager.compileReportToFile(jrxmlFilePath);
@@ -243,8 +252,8 @@ public class Consultas extends javax.swing.JFrame {
                        Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
                    }            
         }else if(cbxFiltro.getSelectedIndex()==4){
-                    String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\proximosEntrega.jrxml";
-                    String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\proximosEntrega.jasper";
+                    String jrxmlFilePath  = "proximosEntrega.jrxml";
+                    String jasperFilePath = "proximosEntrega.jasper";
 
                    try {
                        JasperCompileManager.compileReportToFile(jrxmlFilePath);
@@ -271,6 +280,12 @@ public class Consultas extends javax.swing.JFrame {
                    }            
         }
     }//GEN-LAST:event_btnCActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+               MenuPrincipal mp = new MenuPrincipal();
+        mp.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -578,6 +593,7 @@ public class Consultas extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbxFiltro;
     private com.toedter.calendar.JDateChooser dateFecha;
     private com.toedter.calendar.JDateChooser dateFecha2;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

@@ -37,6 +37,7 @@ public class Usuarios extends javax.swing.JFrame {
         btnAgregarUser = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableUser = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -62,7 +63,7 @@ public class Usuarios extends javax.swing.JFrame {
                 btnAgregarUserActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAgregarUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 90, -1, -1));
+        jPanel1.add(btnAgregarUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 90, 110, -1));
 
         tableUser.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -78,6 +79,14 @@ public class Usuarios extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tableUser);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(26, 270, 590, 230));
+
+        jButton1.setText("Menu Principal");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 117, -1, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -124,6 +133,12 @@ public class Usuarios extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAgregarUserActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+               MenuPrincipal mp = new MenuPrincipal();
+        mp.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     
          public void mostrarTableUsuarios(){
       try {        
@@ -144,14 +159,12 @@ public class Usuarios extends javax.swing.JFrame {
             DefaultTableModel modeloTabla = new DefaultTableModel();
             modeloTabla.addColumn("ID");
             modeloTabla.addColumn("Nombre");
-            modeloTabla.addColumn("Contraseña");
             modeloTabla.addColumn("Tipo de Usuario");
 
             while (resultSet.next()) {
                 Object[] fila = {
                         resultSet.getString("idusuario"),
                         resultSet.getString("nombre"),
-                        resultSet.getString("password"),
                         resultSet.getString("tipoUsuario"),
                 };
                 modeloTabla.addRow(fila);
@@ -203,6 +216,7 @@ public class Usuarios extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarUser;
     private javax.swing.JComboBox<String> cbxTipoUsuario;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

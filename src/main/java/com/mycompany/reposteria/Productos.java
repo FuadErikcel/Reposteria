@@ -630,6 +630,7 @@ public void deleteProduct() {
         txtVencimiento = new com.toedter.calendar.JDateChooser();
         jButton2 = new javax.swing.JButton();
         btnR = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         jLabel1.setText("jLabel1");
 
@@ -791,6 +792,14 @@ public void deleteProduct() {
         });
         jPanel1.add(btnR, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 260, -1, -1));
 
+        jButton3.setText("Menu Principal");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 300, -1, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 600));
 
         pack();
@@ -842,8 +851,8 @@ public void deleteProduct() {
 
     private void btnRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRActionPerformed
       if(cbxProducto.getSelectedIndex()==0){
-             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jrxml";
-             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Galletas.jasper";
+             String jrxmlFilePath  = "Galletas.jrxml";
+             String jasperFilePath = "Galletas.jasper";
         
             try {
                 JasperCompileManager.compileReportToFile(jrxmlFilePath);
@@ -869,8 +878,8 @@ public void deleteProduct() {
                 Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
             }
       }else if(cbxProducto.getSelectedIndex()==1){
-             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Pan.jrxml";
-             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\Pan.jasper";
+             String jrxmlFilePath  = "Pan.jrxml";
+             String jasperFilePath = "Pan.jasper";
         
             try {
                 JasperCompileManager.compileReportToFile(jrxmlFilePath);
@@ -896,8 +905,8 @@ public void deleteProduct() {
                 Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
             } 
       }else if(cbxProducto.getSelectedIndex()==2){
-             String jrxmlFilePath  = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\PastelNormal.jrxml";
-             String jasperFilePath = "C:\\Users\\Fuad Erikcel\\Documents\\NetBeansProjects\\Reposteria\\PastelNormal.jasper";
+             String jrxmlFilePath  = "PastelNormal.jrxml";
+             String jasperFilePath = "PastelNormal.jasper";
         
             try {
                 JasperCompileManager.compileReportToFile(jrxmlFilePath);
@@ -924,6 +933,12 @@ public void deleteProduct() {
             }
       }
     }//GEN-LAST:event_btnRActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+              MenuPrincipal mp = new MenuPrincipal();
+        mp.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -970,6 +985,7 @@ public void deleteProduct() {
     private javax.swing.JComboBox<String> cbxTipoPan;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
